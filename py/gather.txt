@@ -1,0 +1,63 @@
+../dd/data_dictionary_pharmanet-january-1-1996-onwards.xlsx_hlth_rpt.A.csv2 
+R:\working\extract\2019-01-17\pharmanet\hlth_prod_final.dat\hlth_prod_final.dat
+
+../dd/data_dictionary_pharmanet-january-1-1996-onwards.xlsx_dsp_rpt.A.csv2 
+R:\working\extract\2019-01-17\pharmanet\dsp_rpt.dat\dsp_rpt.dat
+
+../dd/data_dictionary_medical-services-plan-payment-information-file-april-1-1985-onwards.xlsx_msp.C.csv2       
+        R:\working\extract\2019-01-17\msp\msp1986-87.C.dat\msp1986-87.C.dat
+        R:\working\extract\2019-01-17\msp\msp1987-88.C.dat\msp1987-88.C.dat
+        R:\working\extract\2019-01-17\msp\msp1988-89.C.dat\msp1988-89.C.dat
+        R:\working\extract\2019-01-17\msp\msp1989-90.C.dat\msp1989-90.C.dat
+        R:\working\extract\2019-01-17\msp\msp1990-91.C.dat\msp1990-91.C.dat
+        R:\working\extract\2019-01-17\msp\msp1991-92.C.dat\msp1991-92.C.dat
+        R:\working\extract\2019-01-17\msp\msp1992-93.C.dat\msp1992-93.C.dat
+        R:\working\extract\2019-01-17\msp\msp1993-94.C.dat\msp1993-94.C.dat
+        R:\working\extract\2019-01-17\msp\msp1994-95.C.dat\msp1994-95.C.dat
+        R:\working\extract\2019-01-17\msp\msp1995-96.C.dat\msp1995-96.C.dat
+        R:\working\extract\2019-01-17\msp\msp1996-97.C.dat\msp1996-97.C.dat
+        R:\working\extract\2019-01-17\msp\msp1997-98.C.dat\msp1997-98.C.dat
+        R:\working\extract\2019-01-17\msp\msp1998-99.C.dat\msp1998-99.C.dat
+        R:\working\extract\2019-01-17\msp\msp1999-00.C.dat\msp1999-00.C.dat
+        R:\working\extract\2019-01-17\msp\msp2000-01.C.dat\msp2000-01.C.dat
+        R:\working\extract\2019-01-17\msp\msp2001-02.C.dat\msp2001-02.C.dat
+        R:\working\extract\2019-01-17\msp\msp2002-03.C.dat\msp2002-03.C.dat
+        R:\working\extract\2019-01-17\msp\msp2003-04.C.dat\msp2003-04.C.dat
+        R:\working\extract\2019-01-17\msp\msp2004-05.C.dat\msp2004-05.C.dat
+        R:\working\extract\2019-01-17\msp\msp2005-06.C.dat\msp2005-06.C.dat
+        R:\working\extract\2019-01-17\msp\msp2006-07.C.dat\msp2006-07.C.dat
+        R:\working\extract\2019-01-17\msp\msp2007-08.C.dat\msp2007-08.C.dat
+        R:\working\extract\2019-01-17\msp\msp2008-09.C.dat\msp2008-09.C.dat
+        R:\working\extract\2019-01-17\msp\msp2009-10.C.dat\msp2009-10.C.dat
+        R:\working\extract\2019-01-17\msp\msp2010-11.C.dat\msp2010-11.C.dat
+        R:\working\extract\2019-01-17\msp\msp2011-12.C.dat\msp2011-12.C.dat
+        R:\working\extract\2019-01-17\msp\msp2012-13.C.dat\msp2012-13.C.dat
+        R:\working\extract\2019-01-17\msp\msp2013-14.C.dat\msp2013-14.C.dat
+        R:\working\extract\2019-01-17\msp\msp2014-15.C.dat\msp2014-15.C.dat
+        R:\working\extract\2019-01-17\msp\msp2015-16.C.dat\msp2015-16.C.dat
+        R:\working\extract\2019-01-17\msp\msp2016-17.C.dat\msp2016-17.C.dat
+
+../dd/data_dictionary_education.xlsx_schlstud.csv2
+        R:\working\extract\use\idomed1991-2017.ft_schlstud.A.dat
+
+../dd/data_dictionary_discharge-abstracts-database-hospital-separations-april-1-1985-onwards.xlsx_hospital.H.csv2
+        R:\working\extract\2019-01-17\hospital\hospital2007-08.H.dat\hospital2007-08.H.dat
+        R:\working\extract\2019-01-17\hospital\hospital2008-09.H.dat\hospital2008-09.H.dat
+
+../dd/data_dictionary_discharge-abstracts-database-hospital-separations-april-1-1985-onwards.xlsx_hospital.N.csv2
+        R:\working\extract\2019-01-17\hospital\hospital2009-10.N.dat\hospital2009-10.N.dat
+        R:\working\extract\2019-01-17\hospital\hospital2010-11.N.dat\hospital2010-11.N.dat
+        R:\working\extract\2019-01-17\hospital\hospital2011-12.N.dat\hospital2011-12.N.dat
+        R:\working\extract\2019-01-17\hospital\hospital2012-13.N.dat\hospital2012-13.N.dat
+        R:\working\extract\2019-01-17\hospital\hospital2013-14.N.dat\hospital2013-14.N.dat
+        R:\working\extract\2019-01-17\hospital\hospital2014-15.N.dat\hospital2014-15.N.dat
+        R:\working\extract\2019-01-17\hospital\hospital2015-16.N.dat\hospital2015-16.N.dat
+        R:\working\extract\2019-01-17\hospital\hospital2016-17.N.dat\hospital2016-17.N.dat
+
+../dd/data_dictionary_discharge-abstracts-database-hospital-separations-april-1-1985-onwards.xlsx_hospital.G.csv2
+        R:\working\extract\2019-01-17\hospital\hospital2001-02.G.dat\hospital2001-02.G.dat
+        R:\working\extract\2019-01-17\hospital\hospital2002-03.G.dat\hospital2002-03.G.dat
+        R:\working\extract\2019-01-17\hospital\hospital2003-04.G.dat\hospital2003-04.G.dat
+        R:\working\extract\2019-01-17\hospital\hospital2004-05.G.dat\hospital2004-05.G.dat
+        R:\working\extract\2019-01-17\hospital\hospital2005-06.G.dat\hospital2005-06.G.dat
+        R:\working\extract\2019-01-17\hospital\hospital2006-07.G.dat\hospital2006-07.G.dat
