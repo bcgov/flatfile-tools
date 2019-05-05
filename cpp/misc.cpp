@@ -61,9 +61,9 @@ FILE * wopen(string fn){
 }
 
 mfile::mfile(string f_n, char * mode){
-	/*
-	 need a flag for if we don't open the whole thing in ram..
-	 */
+  /*
+  need a flag for if we don't open the whole thing in ram..
+  */
   if(mode[0] !='r') err("write mode not yet supported");
   if(mode[1] != 'b') err("incorrect mode str: rb, wb");
   if(mode[0] != 'r' && mode[0] != 'b') err("incorrect mode str: rb, wb");
@@ -116,13 +116,11 @@ void mfile::status(){
 }
 
 size_t mfile::tellg(){
-	return c_pos;
+  return c_pos;
 }
 size_t mfile::len(){
-	return fs;
+  return fs;
 }
-
-
 
 /* get size of file pointer */
 size_t size(FILE * f){
@@ -139,4 +137,3 @@ size_t fsize(string fn){
   fclose(f);
   return fs;
 }
-
