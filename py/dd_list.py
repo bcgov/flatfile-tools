@@ -1,5 +1,5 @@
 '''20190212 finish this when we have xlrd installed? 20190214 used R-project incarnation
-
+   20190501: update to accommodate multiple files with original datadictionary same file name
 current interfaces:
   python rscript.py dd_unpack.R data_dictionary_education.xlsx
   rscript dd_unpack.R data_dictionary_education.xlsx
@@ -15,13 +15,23 @@ import os
 import sys
 import csv
 from misc import *
+
+def run(cmd):
+    print cmd
+    a = os.system(cmd)
+    if a != 0:
+        err("command failed: [" +str(cmd) + "]")
+
+
 if os.path.exists('./dd'):
     err("data dictionary folder already initialized.")
 
 csv.register_dialect('my', delimiter=",", quoting=csv.QUOTE_ALL, skipinitialspace=True)
 whoami = os.popen("whoami").read().strip()
 os.system("mkdir dd")
-os.system("rm -rf dd/*")
+
+# this script should be modified to match listed files, to the dd that are in the same folders! 
+# e.g., have a for loop that runs over all the folders!
 
 excel = []
 xls = os.popen('find R:/DATA/ -name "data_dictionary*.xls"').read().strip().split("\n")
@@ -30,11 +40,13 @@ for xlf in xls:
 xlsx = os.popen('find R:/DATA/ -name "data_dictionary*.xlsx"').read().strip().split("\n")
 for xlf in xlsx:
     excel.append(xlf.strip())
+    print xlf.split("/")
 
 print "copying excel files into dd/ folder.."
-for i in range(0, len(excel)):
-    xlf = excel[i].strip()
-    a = os.system("cp -v " + xlf + " dd/")
+for xlf in excel:
+    if os.path.exists(xlf):
+        date_str = xlf.split('/')[2].strip().replace(" ", "_")
+        run("cp -v " + xlf + " dd/" + date_str + "_" + xlf.split('/')[-1])
 
 print "extracting data dictionaries"
 
@@ -43,16 +55,10 @@ for xlf in excel:
     localf = "./dd/" + xlf
     localfp=localf.replace('\ ','_')
     localfp=localfp.replace(' ','_')
-    a = os.system("mv " + localf + " " + localfp)
+    run("mv " + localf + " " + localfp)
     localf = localfp.strip("\'")
     print "\t" + "./dd/" + localf
 
     # need to update this line:
-    dd_unpack = os.path.abspath("C:/cygwin64/home/" + whoami + "/bin/R/dd_unpack.R").replace('\\','/')
-    cmd = "rscript " + dd_unpack + " " + localf
-    print "\t\t" + cmd
-    a = os.system(cmd)
-
-
-
-
+    dd_unpack = os.path.abspath("R:/" + whoami + "/bin/R/dd_unpack.R").replace('\\','/')
+    run("rscript " + dd_unpack + " " + localf)
