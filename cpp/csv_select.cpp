@@ -129,6 +129,7 @@ int main(int argc, char ** argv){
 	trim(words[s_f_i]);
         if(words[s_f_i].length() != 10){
           cout << words << endl;
+	  cout << "line number: " << l_i << endl;
           err("wrong number of digits");
         }
         if(id.count(words[s_f_i]) > 0){
