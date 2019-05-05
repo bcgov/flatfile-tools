@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char ** argv){
   if(argc < 4) err("usage: dd_slice_apply.cpp [data dictionary.csv] [data input.dat] [desired field 1] [desired field 2]... [desired field n]");
 
-  unsigned int i;
+  register unsigned int i;
   str ddf(argv[1]);
   str dtf(argv[2]);
   vector<str> desf;
@@ -132,7 +132,6 @@ int main(int argc, char ** argv){
       row.push_back(d);
     }
     outfile << str("\n") + join(",", row);
-    outfile.flush();
     if(ci % 100000 == 0){
       time(&t1);
       time_t dt = t1-t0;
