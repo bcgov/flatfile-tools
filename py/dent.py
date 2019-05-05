@@ -92,16 +92,16 @@ for i in range(0, len(lines)):
         n_indent -= 1
         reindent = (n_indent * indent) + line
 
-    print reindent
+    print(reindent)
     if reindent.strip() != '':
         new_lines.append(reindent)
     else:
         new_lines.append('')        
 
 if(n_indent != 0):
-    print "Error:"
-    print "n_indent", n_indent, "algorithm may have missed a:"
-    print "opening bracket" if n_indent <0 else "closing bracket"
+    print("Error:")
+    print("n_indent", n_indent, "algorithm may have missed a:")
+    print("opening bracket" if n_indent <0 else "closing bracket")
     print('indentation level not 0: either open brackets or the logic of this program too simple')
               
 # add a few filters
