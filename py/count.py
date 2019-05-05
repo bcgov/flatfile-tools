@@ -44,8 +44,7 @@ while True:
 counts = []
 frequs = []
 for i in range(0, len(fields)):
-    if fields[i] == "studyid":
-        continue
+    # if fields[i] == "studyid": continue
     print("sorting field ", fields[i], "..")
     if True: #len(occ[i]) < 100:
         n = 0  # number of observations
@@ -69,7 +68,6 @@ for i in range(0, len(fields)):
 f_count.write("COUNTS\n".encode())
 for c in counts:
     f_count.write((str(c) + "\n").encode())    
-
 
 f_freq.write("FREQUENCIES\n".encode())
 for f in frequs:
