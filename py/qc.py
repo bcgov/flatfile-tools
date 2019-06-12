@@ -12,10 +12,10 @@ while True:
     lines = line.strip().split(",")
     nf = len(lines)
     #print nf
-    
+
     ##if nf != 63:
     #    print nf, line
-    
+
     ci += 1
 
     if nf != 63:
@@ -26,5 +26,4 @@ while True:
     nfl = nf
     #if ci > 500:
     #    break
-    
-    
+

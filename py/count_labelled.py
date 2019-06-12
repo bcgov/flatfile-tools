@@ -1,4 +1,4 @@
-'''count occurrence of data observations, per field, per label: 
+'''count occurrence of data observations, per field, per label:
 last col. of input is a label (e.g., cluster label)'''
 #for each field, for each cluster:
 # count how often things occur
@@ -15,7 +15,7 @@ for k in range(0, len(fields)-1):
     for j in range(0,6):
         occ[i][j] = {}
 
-li =0 
+li =0
 while True:
     li += 1
     line = f.readline()
@@ -31,7 +31,7 @@ while True:
             if d not in occ[i][ci]:
                 occ[i][ci][d] = 0
             occ[i][ci][d] += 1
-           
+
 print occ
 print "field,clusterid,nonz-data,count"
 # f.close()
@@ -45,4 +45,3 @@ for k in occ:
             line = ",".join([str(k), str(ci), str(d), str(okcid)])
             print line #f.write(line + "\n")
 # f.close()
-

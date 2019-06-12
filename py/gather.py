@@ -31,7 +31,7 @@ for f in files:
             dat_f = f
 
 print s / 1000000000., "Gb"
-print "---------------------------------------------------"        
+print "---------------------------------------------------"
 
 def run(s):
     global log_n, log_f
@@ -82,7 +82,7 @@ for f in files:
             run("cp -v " + dd_f + " " + dd_f_tmp)
 
         if f[-3:] == "dat":
-            
+
             if dd_f_tmp == None:
                 err("data dictionary not selected")
             dat_f = f
@@ -108,4 +108,4 @@ for f in files:
 
             run("mv -v " + slc_f + " " + output_directory + "/" + fn + "_slice.csv")
 
-log_f.close()      
+log_f.close()

@@ -64,10 +64,10 @@ for i in range(0, len(fields)):
             j = tuple(j)
             s += "\n  " + str(j)
         frequs.append(s)
-        
+
 f_count.write("COUNTS\n".encode())
 for c in counts:
-    f_count.write((str(c) + "\n").encode())    
+    f_count.write((str(c) + "\n").encode())
 
 f_freq.write("FREQUENCIES\n".encode())
 for f in frequs:

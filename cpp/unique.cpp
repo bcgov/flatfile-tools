@@ -23,7 +23,7 @@ int main(int argc, char ** argv){
   long unsigned int ci = 0;
   unsigned int col_index = 0;
 
-  map<string, string> unique; 
+  map<string, string> unique;
 
   // in the future we should reimplement getline to read whole file into ram if can, or use ramless, different interleaves or latencies
   while(getline(dfile, line)){
@@ -48,7 +48,7 @@ int main(int argc, char ** argv){
 
   cout << "outputting last unique lines..." << endl;
   for(map<string, string>::iterator it = unique.begin(); it != unique.end(); it++){
-	outfile << it->second << endl; 
+	outfile << it->second << endl;
   }
   outfile.close();
 

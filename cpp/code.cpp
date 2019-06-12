@@ -82,7 +82,7 @@ int main(int argc, char ** argv){
 
   f.clear();
   f.seekg(0);
-  
+
   ofstream g("code.dat");
   // don't forget to write the header info in here, too, not just the other stuff!
 

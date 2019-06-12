@@ -7,7 +7,7 @@ current interfaces:
 #   1) dd_list.py: list data dictionaries and make copy in local folder, extracting to csv
 #   2) dd_clean.py: clean the data dictionary csv files (for example, they are broken if there's newlines in an excel cell)
 #   3) dd_examine.py: loop through the results to check if the cleaned outputs are good
-#   4) dd_extract.py: 
+#   4) dd_extract.py:
 #   5) dd_match.py
 
 '''
@@ -30,7 +30,7 @@ csv.register_dialect('my', delimiter=",", quoting=csv.QUOTE_ALL, skipinitialspac
 whoami = os.popen("whoami").read().strip()
 os.system("mkdir dd")
 
-# this script should be modified to match listed files, to the dd that are in the same folders! 
+# this script should be modified to match listed files, to the dd that are in the same folders!
 # e.g., have a for loop that runs over all the folders!
 
 excel = []

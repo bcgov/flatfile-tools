@@ -42,7 +42,7 @@ int main(int argc, char ** argv){
   string d;
   for(j = 0; j < filenames.size(); j++){
     cout << "data input file: " << filenames[j] << endl;
-    //mfile t(filenames[j], "rb"); 
+    //mfile t(filenames[j], "rb");
     ifstream dfile(filenames[j]);
 
     getline(dfile, line);

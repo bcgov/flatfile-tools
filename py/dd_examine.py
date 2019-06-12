@@ -12,4 +12,3 @@ fn = os.popen('ls -1 ./dd/*.csv2')
 for f in fn:
     f = f.strip()
     a = os.system('vi ' + f)
-

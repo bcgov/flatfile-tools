@@ -38,7 +38,7 @@ int main(int argc, char ** argv){
   time_t t0; time(&t0); time_t t1;
 
   for(j = 0; j < filenames.size(); j++){
-    cout << "data input file: " << filenames[j] << endl; 
+    cout << "data input file: " << filenames[j] << endl;
     ifstream dfile(filenames[j]);
 
     getline(dfile, line);

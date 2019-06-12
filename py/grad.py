@@ -1,4 +1,4 @@
-# 20190416 version; grad concept: > grad 1 psy_pssg_cohort_20190423.csv_unnest.csv 
+# 20190416 version; grad concept: > grad 1 psy_pssg_cohort_20190423.csv_unnest.csv
 import os, sys, math, pickle, datetime
 from misc import load_fields, assert_exists
 # run by opening C:/cygwin64/Cygwin.bat
@@ -142,7 +142,7 @@ if not v_2:
         for i in studyid:
             if i in dat: had += 1.
         print(str(100. * had / float(len(studyid))) + " % of cohort, had " + name)
-    
+
     had(dat_schlstud, studyid, "schlstud")
     had(dat_studcrd, studyid, "studcrd")
     had(dat_registry, studyid, "registry")
@@ -170,8 +170,8 @@ def in_bc_when_gr12_age(i):
         reg_year = int(dataline[fdat_registry['year']])
         daysreg = int(dataline[fdat_registry['daysreg']])
         start_day = int(dataline[fdat_registry['startday']])
-        end_day = start_day + daysreg - 1 
-        # case for 17 and 18 
+        end_day = start_day + daysreg - 1
+        # case for 17 and 18
         if reg_year == school_yr_17 and start_day <= jun30_yr17 and jun30_yr17 <= end_day:
             in_bc = True
         if reg_year == school_yr_18 and start_day <= jun30_yr18 and jun30_yr18 <= end_day:
@@ -200,7 +200,7 @@ for i in studyid: # for every studyid (call it "i")
         for dataline in dat_schlstud[i]:
             age = int(dataline[fdat_schlstud['age_in_years_jun_30']])
             max_age = age if max_age is None else max_age
-            max_age = age if age > max_age else max_age           
+            max_age = age if age > max_age else max_age
         if max_age < 17:
             code[i] = "N/A_2"
             continue
@@ -213,14 +213,14 @@ for i in studyid: # for every studyid (call it "i")
         if not v_2:
             code[i] = "NO_0" if ever_adult_student else ("NO_1" if in_bc_when_gr12_age(i) else "N/A_3")
         else:
-            code[i] = "NO_1" if in_bc_when_gr12_age(i) else ("NO_0" if ever_adult_student else "N/A_3")   
+            code[i] = "NO_1" if in_bc_when_gr12_age(i) else ("NO_0" if ever_adult_student else "N/A_3")
 
 lines = ["studyid,grad_concept3,grad_concept7" + ("_v2" if v_2 else "")]
 for i in studyid:
 	w = code[i].split("_")
 	code_short = code[i] if len(w) ==1 else w[0]
 	lines.append(str(i) + "," + code_short + "," + str(code[i]))
-	
+
 out_fn = "graduation_output" + ("_v2" if v_2 else "") + ".csv"
 open(out_fn, "wb").write(('\n'.join(lines)).encode())
 
@@ -231,4 +231,3 @@ a = os.system("cat " + out_fn + "_frequ")
 # call the second version of the code:
 if not v_2:
     a = os.system("grad 2 " + sys.argv[2]) # call this script and invoke second version
-

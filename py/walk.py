@@ -47,7 +47,7 @@ for r, d, f in os.walk(pwd):
             print(p.strip())
 
             fwords = _file.split(".")
-            
+
             if len(fwords) > 1:
                 # count file sizes
                 c += os.stat(p.strip()).st_size
@@ -58,7 +58,7 @@ for r, d, f in os.walk(pwd):
                     if e=="csv": # or e=="dat": is dat fixedwidth?
                         n_fields, n_line = wc(p)
                         print(str(p) + "," + str(n_fields) + "," + str(n_line) + "\n")
-            
+
 print("TOTAL Selection Size (GB)" + str(c/1000000000.))
 print("selected file  ext. count" + str(ext))
 
@@ -71,5 +71,5 @@ print("")
 print("Number of files selected, by extension:")
 for ee in e:
     print("\t"+str(ee[1]) + "," + str(ee[0]))
-    
+
 # how to use unix find without showing a bunch of irrelevant messages: > find ./ -name "*.*" 2>&1 | grep -v "Permission denied"

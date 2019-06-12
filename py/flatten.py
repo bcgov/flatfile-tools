@@ -47,7 +47,7 @@ ci = 0
 for k in d:
     if len(d[k]) > 1000:
         # scrap studyid with unreasonably many entries
-        continue 
+        continue
     else:
         dd = d[k]
         out = dd[0]
@@ -78,7 +78,7 @@ for k in d:
         ttt = tt
         tt = time.time()
         print ci/1000, "2/2 k, S/10k: ", tt-ttt
-        
+
 f.close(); of.close()
 print "done"
 print "  ", int((ci / (time.time() - t))/1000.), "K lines per sec"

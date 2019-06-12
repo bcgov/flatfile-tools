@@ -11,7 +11,7 @@ def rm_empty(path, rm_root=True):
         p = os.path.join(path, f)
         if os.path.isdir(p):
             rm_empty(p)
-               
+
     # if folder empty, delete it
     files = os.listdir(path)
     if len(files) == 0 and rm_root:

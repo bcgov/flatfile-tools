@@ -64,4 +64,3 @@ print "done"
 print "  ", int((ci / (time.time() - t))/1000.), "K lines per sec"
 
 f.close(); of.close()
-

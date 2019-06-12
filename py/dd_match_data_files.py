@@ -14,7 +14,7 @@ except:
     data_dir = 'R:\\working\\extract'
     cmd = "find " + data_dir + ' -name "*.dat" -type f'
     datfiles = os.popen(cmd).read().strip().split('\n')
-    for i in range(0, len(datfiles)): 
+    for i in range(0, len(datfiles)):
         datfiles[i] = os.path.abspath(datfiles[i]).strip()
     datfiles = set(datfiles)
     datfiles = list(datfiles)
@@ -34,7 +34,7 @@ for f in lines:
         err("csv2 file expected first field name: start")
     if fields[1].lower() != "stop":
         err("csv2 file expected second field name: stop")
-    
+
     # for l in csv_l: print l.strip()
     csv_l = csv_l[1:] # remove header and process
 

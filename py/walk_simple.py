@@ -7,7 +7,7 @@ from misc import *
 args = sys.argv
 if len(args) < 2:
     err("usage: find [path]")
-    
+
 pwd = sys.argv[1].strip()
 if not os.path.exists(pwd) and not os.path.isdir(pwd):
     print "Error: directory does not exist", pwd
@@ -20,7 +20,7 @@ for r, d, fs in os.walk(pwd):
         p = os.path.join(r,f) + os.linesep
         print p.strip()
 
-        # file-ext count        
+        # file-ext count
         fw = f.split(".")
         if len(fw) > 1:
             e = fw[-1]

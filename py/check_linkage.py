@@ -36,7 +36,7 @@ while True:
             err(str(len(w)) + " " + str(n_f))
         # write out line
         if w[-1]!=NULL_STUDY_ID:
-            if (w[0][0:3]).lower() != 'non': 
+            if (w[0][0:3]).lower() != 'non':
                 special[w[-1]] = w[0]
             gender[w[-1]] = w[1]
             if not w[-1] in ids:
@@ -79,7 +79,7 @@ for i in ids:
         gender_count[mygender] =0
     gender_count[mygender] += 1
 
-    
+
 print "mcount", mcount
 print "fcount", fcount
 print "scount", scount

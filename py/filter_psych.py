@@ -23,7 +23,7 @@ fields = f.readline().split(",")
 print fields
 g.write(",".join(fields)+"\n")
 
-ci = 0    
+ci = 0
 while True:
     line = f.readline()
     if not line:
@@ -38,7 +38,7 @@ while True:
     if ci % 10000 == 0:
         ttt = tt
         tt = time.time()
-        print ci/1000, "1/2 k, S/10 k: ", tt-ttt  
+        print ci/1000, "1/2 k, S/10 k: ", tt-ttt
 
 '''20180108 special needs flag:
 if they got a special needs designation,
@@ -53,4 +53,3 @@ also want a secondary search in a new col.:
 1) first special needs code
 2) second special needs code..
 3) moderate or severe? '''
-    

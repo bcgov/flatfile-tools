@@ -29,13 +29,13 @@ while True:
     w1 = line1.split(","); w2 = line2.split(",")
     if w1[-1] != w2[-1]:
         err("mismatch")
-        
+
     if len(w1) != n_f1:
         err("")
 
     of.write(",".join(w1)); of.write(",")
     of.write(",".join(w2)); of.write("\n")
-    
+
     ci += 1
     if ci % 10000 == 0:
         ttt = tt

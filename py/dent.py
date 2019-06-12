@@ -47,13 +47,13 @@ if ext(in_file) == 'py':
 
 if not exists(in_file):
     err("can't find file: " + str(in_file))
-    
+
 ext = in_file.split('.')[-1]
 if not(ext =='h' or ext == 'c' or ext == 'cpp' or ext =='js'):
     print('warning: only c or cpp files supported')
 
 n_indent = 0  # indentation level
-indent = ' ' * spaces_per_tab 
+indent = ' ' * spaces_per_tab
 dat = open(in_file).read()
 bak_file = in_file + '.bak'
 wopen(bak_file).write(dat)
@@ -85,7 +85,7 @@ for i in range(0, len(lines)):
         last_char = line[-1]
     except:
         pass
-    
+
     if last_char == '{':
         n_indent += 1
     elif last_char =='}' or last_chars == '};':
@@ -96,14 +96,14 @@ for i in range(0, len(lines)):
     if reindent.strip() != '':
         new_lines.append(reindent)
     else:
-        new_lines.append('')        
+        new_lines.append('')
 
 if(n_indent != 0):
     print("Error:")
     print("n_indent", n_indent, "algorithm may have missed a:")
     print("opening bracket" if n_indent <0 else "closing bracket")
     print('indentation level not 0: either open brackets or the logic of this program too simple')
-              
+
 # add a few filters
 new_lines_filt = []
 for i in range(0, len(new_lines)):
@@ -111,7 +111,7 @@ for i in range(0, len(new_lines)):
         new_lines_filt[-1] += '{'
     else:
         new_lines_filt.append(new_lines[i])
-          
+
 out = '\n'.join(new_lines_filt).replace('\t', spaces_per_tab * ' ')
 out = out.replace('\n\n\n', '\n\n')
 wopen(in_file).write(out)

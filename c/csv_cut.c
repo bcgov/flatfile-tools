@@ -11,7 +11,7 @@ int main(int argc, char ** argv){
   if(argc < 4) err("cut.cpp: usage:\n\tcut.cpp [name of cohort/select file] [FIELD_NAME] [name of file to cut] .. [name of last file to cut]\n");
 
   for0(i, argc) printf("\targ %d: %s\n", i, argv[i]);
- 
+
   char * select_fn = argv[1];
   char * field_name = argv[2];
 

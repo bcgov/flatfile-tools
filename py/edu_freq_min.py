@@ -13,7 +13,7 @@ def freq_min(fn):
     f = open(fn)
     if f == None:
         err("failed to open file: " + str(fn))
-    
+
     fields = f.readline().strip().split(",")
     print fields
     lookup = {}
@@ -27,7 +27,7 @@ def freq_min(fn):
 
     #mindate, freq = f(studyid, hp.din_pin)
     dat = {}
-    
+
     ci = 0
     f_size = os.stat(fn).st_size
 
@@ -84,7 +84,7 @@ def freq_min(fn):
     fields.append("min_srv_date")
     g.write(",".join(fields))
     f.readline() # fields
-    
+
     ci = 0
     while True:
         line, words = None, None
@@ -99,7 +99,7 @@ def freq_min(fn):
         for i in range(0, len(words)):
             words[i] = words[i].strip().lower()
 
-        key = words[lookup["studyid"]] + "," + words[lookup["hp.gen_drug"]] 
+        key = words[lookup["studyid"]] + "," + words[lookup["hp.gen_drug"]]
         if key not in dat:
             err("key should have been found")
         freq, min_serv_date = dat[key]
@@ -117,7 +117,6 @@ def freq_min(fn):
 
 freq_min("dsp_rpt.dat_slice.csv_select-STUDY.csv_lookup.csv")
 freq_min("dsp_rpt.dat_slice.csv_select-CONTROL.csv_lookup.csv")
-
 
 
 

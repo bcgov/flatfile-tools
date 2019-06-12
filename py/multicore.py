@@ -1,4 +1,4 @@
-# 20190212 multicore.py run jobs using multicore (still have to test this) 
+# 20190212 multicore.py run jobs using multicore (still have to test this)
 import os
 import sys
 import time
@@ -17,7 +17,7 @@ if not os.path.exists(fn):
 task = open(fn).read().strip().split("\n")
 tasks, n_task = [x.strip() for x in task], len(task)
 
-# concurrency control 
+# concurrency control
 lock, p_lock = allocate_lock(), allocate_lock()
 threads_alive, next_j, j_max = ncpu, 0, n_task - 1
 

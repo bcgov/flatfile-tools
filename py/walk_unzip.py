@@ -42,7 +42,7 @@ if not os.path.exists(xform):
 
 if not os.path.isdir(xform):
     err("")
-    
+
 # traverse present filesystem tree
 for r, d, f in os.walk(pwd):
     for _file in f:
@@ -83,7 +83,7 @@ for r, d, f in os.walk(pwd):
                     if not os.path.exists(mypath):
                         #print "mypath", mypath
                         os.mkdir(mypath)
-                        
+
             # extract zip to folder
             cmd = '"C:\\Program Files\\7-Zip\\7z.exe" e ' + z_file.strip() + ' -o' + out_dir
             #z_file = z_file.replace("R:", "/cygdrive/r")
@@ -94,7 +94,7 @@ for r, d, f in os.walk(pwd):
                 a = os.system(cmd)
             except:
                 err("Error: failed to extract zipfile: " + z_file.strip())
-                
+
 print("TOTAL Selection Size (GB)" +str(c/1000000000.))
 print("selected file  ext. count" + str(ext))
 # ff.close()

@@ -4,7 +4,7 @@ import sys
 from misc import *
 
 def yes_no(question):
-    while True:   
+    while True:
         reply = str(raw_input(question+' (y/n): ')).lower().strip()
         return True if reply[0] == 'y' else False
 

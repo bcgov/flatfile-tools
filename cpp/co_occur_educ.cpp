@@ -44,7 +44,7 @@ int main(int argc, char ** argv) {
     std::vector<std::string> w(split(line, ','));
 
     if(ci == 0) if(w[w.size() -1] != "studyid") err("expected field studyid");
-        
+
     string s_id(w[w.size() - 1]); // study id
 
     bool replace = true;

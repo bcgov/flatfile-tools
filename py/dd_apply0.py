@@ -17,7 +17,7 @@ if ddf.split('.')[-1] != 'csv':
     err('arg 1 must be csv')
 if dtf.split('.')[-1] != 'dat':
     err('arg 2 must be dat')
-    
+
 
 lines = open(ddf).read().strip().split('\n')
 start, stop, length, label = [], [], [], []
@@ -63,4 +63,3 @@ while(True):
 of.close()
 
 
-      

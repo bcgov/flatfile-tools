@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// slice.cpp: slice out select variables from CSV 
-// date: 20190124 
+// slice.cpp: slice out select variables from CSV
+// date: 20190124
 //---------------------------------------------------------------------------//
 #include<map>
 #include"misc.h"
@@ -85,7 +85,7 @@ int main(int argc, char ** argv){
 	      cout << "w.size()" << w.size() << endl;
 	      cout << "n_f " << n_f << endl;
 	      cout << w << endl;
-	      
+
 	      err(string("unexpected number of fields"));
       }
       for(it = selected.begin(); it != selected.end(); it++){

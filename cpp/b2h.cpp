@@ -14,7 +14,7 @@ int main(int argc, char ** argv){
   size_t i = 0;
   size_t f_p = 0;
 
-  if(argc > 1){ 
+  if(argc > 1){
     f_n, fn = argv[1], str(argv[1]);
     ofstream f(fnf_fn); f << fn; f.close();
     ofstream g(fnf_fnp); g << 0; g.close();

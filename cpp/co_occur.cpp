@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
 // co_occur.cpp: co-occurence for multi-variate table
-// date: 20190120 
-// info: input table given as cmd. arg: file assumed CSV: rows unique obs 
+// date: 20190120
+// info: input table given as cmd. arg: file assumed CSV: rows unique obs
 //---------------------------------------------------------------------------//
 #include<map>
 #include<set>

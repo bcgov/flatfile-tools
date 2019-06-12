@@ -6,4 +6,3 @@ lines = os.popen('cat /proc/cpuinfo | grep "cpu cores"').read().strip().split('\
 for line in lines:
     ncores += int(line.strip().split()[-1])
 print "number of cpu cores", ncores
-

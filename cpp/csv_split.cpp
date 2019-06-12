@@ -1,5 +1,5 @@
 #include"misc.h"
-/* 20190303  split CSV file into multiple data sets, for efficient memory usage 
+/* 20190303  split CSV file into multiple data sets, for efficient memory usage
   note: scan / qc / qa should be same program: take a pass over the file,
  verify quality / consistency (should have same # of fields)
  note: the integrity of one of these datasets would need to be confirmed by checking:

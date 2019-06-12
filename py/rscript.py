@@ -7,4 +7,3 @@ if len(sys.argv) < 2:
 # convert to a path that works!
 cmd = os.popen("(cygpath -d '/cygdrive/c/Program Files/R/R-3.5.3/bin/Rscript.exe')").read().strip()
 a = os.system(cmd + " " + " ".join(sys.argv[1:]))
-

@@ -23,7 +23,7 @@ for i in range(0, len(compare)):
 for i in range(0, len(compare)):
     fields[i] = fields[i].replace("_THIS_COLL", "")
 
-g.write(",".join(fields)+"\n"); ci = 0    
+g.write(",".join(fields)+"\n"); ci = 0
 while True:
     line = f.readline()
     if not line:
@@ -31,7 +31,7 @@ while True:
     w = line.strip().split(",")
     if len(w) != len(fields):
         err("len(w) != len(fields)")
- 
+
     # innocent until proven guilty
     special, special1, special2 = False, False, False
     def spec(c):
@@ -59,6 +59,5 @@ while True:
     g.write(",".join(w) + "\n")
     ci += 1
     if ci % 10000 == 0:
-        ttt = tt; tt = time.time(); print ci/1000, "1/2 k, S/10 k: ", tt-ttt  
-        
-        
+        ttt = tt; tt = time.time(); print ci/1000, "1/2 k, S/10 k: ", tt-ttt
+

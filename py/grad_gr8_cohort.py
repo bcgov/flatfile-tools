@@ -1,6 +1,6 @@
 # 20190430 version
 
-# grad_gr8_cohort youth_cohort.csv 4 
+# grad_gr8_cohort youth_cohort.csv 4
 
 #  youth_cohort.csv has studyid, dob (yyyy-mm)
 
@@ -141,7 +141,7 @@ if True:
         for i in studyid:
             if i in dat: had += 1.
         print(str(100. * had / float(len(studyid))) + " % of cohort, had " + name)
-    
+
     had(dat_schlstud, studyid, "schlstud")
     had(dat_studcrd, studyid, "studcrd")
     had(dat_registry, studyid, "registry")

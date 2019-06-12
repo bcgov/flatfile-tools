@@ -22,7 +22,7 @@ for r, d, f in os.walk('./dd/'):
     for ff in f:
         print ff.strip()
         if len(ff.strip().split(' ')) > 1:
-            cmd = "mv ./dd/'" + ff.strip() + "' ./dd/" + ff.strip().replace(' ','_')  +  " " 
+            cmd = "mv ./dd/'" + ff.strip() + "' ./dd/" + ff.strip().replace(' ','_')  +  " "
             print "***", cmd
             a = os.system(cmd)
 
@@ -33,7 +33,7 @@ for i in range(0, len(csvf)):
     cleanlines = []
     #print "\t", csvf[i]
     lines = open(csvf[i]).read().strip().replace('\r\n',';').split('\n')
-    
+
     def clean(s):
         return s.strip().replace('"','').strip(',').strip()
     lines[0] = clean(lines[0])
@@ -56,7 +56,7 @@ for i in range(0, len(csvf)):
             hdr, w = reader
             tf.close()
         if len(w) != nf and w[0].strip().strip('"').strip() == str(j):
-            w = w[1 : nf + 1] 
+            w = w[1 : nf + 1]
         if len(w) != nf:
             print "Error: ", w
             print len(w), nf

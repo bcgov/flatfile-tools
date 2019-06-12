@@ -29,7 +29,7 @@ pwd = os.popen("pwd").read().strip()
 
 if sys_n == "cygwin":
     pwd = os.popen("cygpath -w -a ./").read().strip()
-    
+
 work_dir = os.path.abspath(pwd)
 
 if not file_dir == work_dir:
@@ -101,7 +101,7 @@ def compile(f):
                  'int main(int argc, char ** argv){',
                  #'  string cmd("/cygdrive/c/Program\\\\ Files/Python35/python.exe ");',
                  '  string cmd("/cygdrive/c/Python27/python.exe ");',
-                 '  cmd += string("R:/' + os.popen("whoami").read().strip() + '/bin/py/' + fn + '.py");', 
+                 '  cmd += string("R:/' + os.popen("whoami").read().strip() + '/bin/py/' + fn + '.py");',
                  '  for(int i=1; i<argc; i++){',
                  '    cmd += string(" ") + string(argv[i]);',
                  '  }',
@@ -111,7 +111,7 @@ def compile(f):
                  '}']
         cf.write('\n'.join(lines).encode())
         cf.close()
-        cmd = 'g++ -w -O3 -o ' + fn + '.exe ' + ' wrap_py.cpp ' 
+        cmd = 'g++ -w -O3 -o ' + fn + '.exe ' + ' wrap_py.cpp '
         print(cmd)
         a = os.system(cmd)
         a = os.system("rm -f wrap_py.cpp")

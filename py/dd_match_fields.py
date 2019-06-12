@@ -4,7 +4,7 @@ import sys
 '''
   grep -n DE.HLTH_PROD_LABEL ./dd/*.csv2
     data_dictionary_pharmanet-january-1-1996-onwards.xlsx_dsp_rpt.A
-    
+
   dd_fields.exe data_dictionary_pharmanet-january-1-1996-onwards.xlsx_dsp_rpt.A'''
 
 labels_for_file = {}

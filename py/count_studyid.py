@@ -36,8 +36,7 @@ def count_id(fn):
             count_count[c] += 1
         else:
             count_count[c] = 1
-            
+
     print "count of counts", str(count_count)
 
 count_id(filename)
-

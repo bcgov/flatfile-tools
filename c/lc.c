@@ -20,7 +20,7 @@ int main(int argc, char ** argv){
   }
 
   long int lc = 0;
-  while(fgets(str, MAXCHAR, fp) != NULL) lc ++; 
+  while(fgets(str, MAXCHAR, fp) != NULL) lc ++;
   fclose(fp);
 
   printf("lines %ld\n", lc);

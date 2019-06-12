@@ -21,4 +21,3 @@ for p in fn:
         print p, "-->", tgt[p]
         shutil.move(p, tgt[p])
 
-

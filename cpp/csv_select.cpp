@@ -1,4 +1,4 @@
-/* 20190303 csv_select: filter a given CSV file for records where a given field matches the same field in the other file (somewhere) 
+/* 20190303 csv_select: filter a given CSV file for records where a given field matches the same field in the other file (somewhere)
 
 use this for filtering a dataset for a specific cohort (represented by studyid in another file)
 
@@ -10,7 +10,7 @@ less vague example (python) from run_select_cohort.py:
    	cmd = "csv_select cohort.csv_studyid studyid " + f
 	print cmd
 	a = os.system(cmd)
- 
+
   */
 #include"misc.h"
 
@@ -148,10 +148,10 @@ int main(int argc, char ** argv){
         cout << words << string(" wsfi: ") << words[s_f_i] << (matches_this_iter?string(" true"):string(" false")) << endl;
         fflush(outf);
 	matches_this_iter = false;
-      }  
+      }
     }
     f_f.close();
-    fclose(outf); 
+    fclose(outf);
     fclose(out2); // 20190310 added support for excluded / deselected set
   }
 

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
-// co_occur_simple.cpp: co-occurence for bivariate table (first 2 cols) 
-// date: 20190120 
-// info: input table assumed CSV with header: rows unique obs 
+// co_occur_simple.cpp: co-occurence for bivariate table (first 2 cols)
+// date: 20190120
+// info: input table assumed CSV with header: rows unique obs
 //---------------------------------------------------------------------------//
 #include<map>
 #include"misc.h"
