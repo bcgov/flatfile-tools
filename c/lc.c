@@ -1,13 +1,13 @@
-/* count lines in a file in C; an illustrative example since
- can do this in Linux with
-     wc -l  */
+/* 20190602  use C to count lines in a file that have some non-space character in them..
+    ..similar but distinct from "wc -l" in linux */
 #include"misc.h"
+#include"string.h"
 #define MAXCHAR 1024*1024
 
 int main(int argc, char ** argv){
   if(argc < 2){
-	  printf("lc.c: row count for file\n\tUsage: lc [filename]\n");
-	  exit(1);
+    printf("lc.c: row count for file\n\tUsage: lc [filename]\n");
+    exit(1);
   }
   FILE *fp;
   char str[MAXCHAR];
@@ -16,13 +16,21 @@ int main(int argc, char ** argv){
 
   if (fp == NULL){
     printf("Error: could not open file: %s\n", filename);
-    return 1;
+    exit(1);
   }
 
   long int lc = 0;
-  while(fgets(str, MAXCHAR, fp) != NULL) lc ++;
+  bool had_nonspace;
+  unsigned int i;
+  while(fgets(str, MAXCHAR, fp)){
+    for(i = 0; i < strlen(str); i++){
+      if(!isspace(str[i])){
+        lc++;
+        break;
+      }
+    }
+  }
   fclose(fp);
-
-  printf("lines %ld\n", lc);
+  printf("%ld\n", lc);
   return 0;
 }

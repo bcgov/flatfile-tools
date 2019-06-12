@@ -57,12 +57,12 @@ profile = ['alias vim="/cygdrive/c/Program\ Files\ \(x86\)/Vim/vim81/vim.exe"',
            'alias Rscript="/cygdrive/c/Program\ Files/R/R-3.5.2/bin/Rscript.exe"',
            'alias python="/cygdrive/c/Program\ Files/Python35/python/" #alias python="/cygdrive/c/Python27/python.exe"',
            'export PATH="$PATH:$(pwd)"']
-try:
-    open('./.bash_profile','wb').write(('\n'.join(profile)).encode())
-    f_contents = open('./.bash_profile').read().strip()
-    os.popen('source ./.bash_profile')
-except:
-    print("warning: not sure if we could set environment variables")
+#try:
+#    open('./.bash_profile','wb').write(('\n'.join(profile)).encode())
+#    f_contents = open('./.bash_profile').read().strip()
+#    os.popen('source ./.bash_profile')
+#except:
+#    print("warning: not sure if we could set environment variables")
 
 compiled = {}
 
@@ -79,7 +79,7 @@ def compile(f):
     else:
         return
     if ext == 'c' or ext == 'cpp':
-        cmd = 'g++ -w -O3 -o ' + fn + '.exe ' + f
+        cmd = 'g++ -w -O4 -march=native -flto -o ' + fn + '.exe ' + f
         if ext == 'cpp':
             cmd += ' cpp/misc.cpp'
         cmd += ' -lopengl32 -lglu32 -lgdi32'

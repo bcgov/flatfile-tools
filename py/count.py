@@ -11,6 +11,7 @@ f = open(sys.argv[1])
 f_count = open(sys.argv[1] + "_count", "wb")
 f_freq = open(sys.argv[1] + "_frequ", "wb")
 
+IGNORE_STUDYID = len(sys.argv) > 2
 
 fields = f.readline().strip().split(",")
 print("fields", fields)
@@ -44,7 +45,8 @@ while True:
 counts = []
 frequs = []
 for i in range(0, len(fields)):
-    # if fields[i] == "studyid": continue
+    if IGNORE_STUDYID and (fields[i] == "studyid"):
+        continue
     print("sorting field ", fields[i], "..")
     if True: #len(occ[i]) < 100:
         n = 0  # number of observations

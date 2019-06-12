@@ -16,6 +16,10 @@ dd_schlstud, dd_studcrd = "dd/2019-01-24_data_dictionary_education.xlsx_schlstud
 for f in [dd_reg, dd_schlstud, dd_studcrd]:
     assert_exists(f)
 
+if len(sys.argv) < 3:
+    print "Important: delete the *.p files before running, if you change the cohort file!!!"
+    err("Usage: grad_gr8_cohort [cohort_file.csv] [number of years=6?]")
+
 cohort_file = sys.argv[1] #'youth_cohort.csv' # delete *.p files and other intermediary files if cohort changes
 number_of_years = None
 try:
@@ -172,6 +176,7 @@ for i in studyid: # for every studyid (call it "i")
     gr8_year, grad_year = None, None
 
     if i in dat_studcrd:
+        # a student in this table did graduate: has credential
         for dataline in dat_studcrd[i]:
             credential_cnt = dataline[fdat_studcrd['credential_cnt']]
             trax_school_year = dataline[fdat_studcrd['trax_school_year']]
@@ -201,38 +206,43 @@ for i in studyid: # for every studyid (call it "i")
                 gr8_year = school_year
     my_gr8_year[i] = gr8_year
 
-    code[i] = ""
+    code[i] = "" #N/A_4-unknown"
     if gr8_year is None:
-        code[i] += "N/A_0-no-gr8"
+        code[i] = "N/A_4-no-gr8"
         continue
     else:
+
+        if not(grad_year is None): # graduated sometime
+            if grad_year - gr8_year <= number_of_years:
+                code[i] = "YES_1-gradwindow"; continue  # graduated within n_year window! Woohoo
+            else:
+                code[i] = "YES_2_grad_after_window"; continue # graduated outside of the window
+        else:
+            code[i] += "NO_2-nevergradded" # didn't graduate yet
+
+        code[i] = "N/A_0-not-in-registry" if i not in dat_registry else code[i]
+        if i not in dat_registry: continue
+        code[i] = "N/A_1-not-in-schlstud" if i not in dat_schlstud else code[i]
+        if i not in dat_schlstud: continue
+
         # too young to graduate? e.g., start gr8 sep 2015; 2015 + 4 = 2019 -> bigger than start of last observed school year
         if gr8_year + 4 > start_of_last_observed_school_year:
-            code[i] += "N/A_1-too-young-to-grad" # too young to graduate
+            code[i] = "N/A_2-too-young-to-grad" # too young to graduate
             continue
-
-        # not too young to graduate
-        if grad_year is None:
-            code[i] += "NO_0-didnt-grad-ever" # didn't graduate yet
-        else:
-            if grad_year - gr8_year <= number_of_years:
-                code[i] += "YES-grad" # graduated! Woohoo
-            else:
-                code[i] += "NO-1_grad_after_window" # didn't graduate within window
 
         # MSP: check if ever left bc between gr8 and when they should have bn. in grade 12.
         left_province = False # left province or died?
         if i not in dat_registry:
-            code[i] += "NA_2-not-in-registry"; continue
+            code[i] += "N/A_0-not-in-registry"; continue
         reg_yrs = [int(dataline[fdat_registry['year']]) for dataline in dat_registry[i]]
         for year in range(gr8_year + 3, gr8_year + 4): # end bracket zero indexed (need +1) subtract one for year interval mismatch
             if year not in reg_yrs:
                 left_province = True
         if left_province:
-            code[i] += "NO_2-left-province"
+            code[i] = "N/A_3-left-province"; continue
 
 count = {}
-lines = ["studyid,grad_output4_short, grad_output4"]
+lines = ["studyid,grad_output_n" + str(number_of_years) + "_short, grad_output_n" + str(number_of_years)]
 for i in studyid:
 	w = code[i].split("_")
 	code_short = code[i] if len(w) ==1 else w[0]
@@ -240,17 +250,17 @@ for i in studyid:
         if code[i] not in count:
             count[code[i]] = 1
         count[code[i]] += 1
-        if code[i] == 'YES-gradNO_2-left-province':
-            print i, code[i], "my_gr8_year", my_gr8_year[i]
+        #if code[i] == 'YES-gradNO_2-left-province':
+        #    print i, code[i], "my_gr8_year", my_gr8_year[i]
 print count
 
 # print "GRADUATION RATE %", 100. * count['YES'] / (count['YES'] + count['NO_0'] + count['NO_1'])
 # print "too young to graduate %(total)", 100.*count['N/A_1'] / (count['N/A_0'] + count['N/A_1'] + count['YES'] + count['NO_0'] + count['NO_1'])
 
 
-out_fn = "grad_output4.csv"
+out_fn = "graduation_output_n" + str(number_of_years) + ".csv"
 open(out_fn, "wb").write(('\n'.join(lines)).encode())
 
 # generate frequency table
-run("count " + out_fn)
+run("count " + out_fn + " SUPPRESS_STUDYID=True")
 # run("cat " + out_fn + "_frequ")

@@ -31,12 +31,14 @@ while True:
         remediate = False
         w = line.split(",")
         if len(w) != n_f:
-            tmp_fn = "tu.csv"
+            tmp_fn = "./.temp1234.csv"
             g=open(tmp_fn,"wb"); g.write(fields+"\n"+line); g.close()
-            reader = csv.reader(open(tmp_fn), dialect='my')
+            g=open(tmp_fn)
+            reader = csv.reader(g, dialect='my')
             hdr, lin = reader
             w = lin
             remediate = True
+            g.close()
         if len(w) != n_f:
             print("error", len(w), n_f)
             sys.exit(1)
@@ -53,6 +55,7 @@ while True:
         ttt = tt
         tt = time.time()
         print(ci/1000, "k, S/k: ", tt-ttt)
+a = os.system("rm -f ./.temp1234.csv")
 print("done")
 print("  ", int((ci / (time.time() - t))/1000.), "K lines per sec")
 print("remediate count", r_c)

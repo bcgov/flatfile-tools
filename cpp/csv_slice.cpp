@@ -36,12 +36,12 @@ int main(int argc, char ** argv){
   string delim(",");
 
   if(argc >= 3){
-	  for(int i = 2; i < argc; i++){
-		  string s_i(argv[i]);
-		  trim(s_i);
-		   std::transform(s_i.begin(), s_i.end(), s_i.begin(), ::tolower); // to lower case
-		  select.insert(s_i);
-	  }
+    for(int i = 2; i < argc; i++){
+      string s_i(argv[i]);
+      trim(s_i);
+      std::transform(s_i.begin(), s_i.end(), s_i.begin(), ::tolower); // to lower case
+      select.insert(s_i);
+    }
   }
   cout << "selected fields: " << select << endl;
 
@@ -49,8 +49,7 @@ int main(int argc, char ** argv){
   long int n_f = 0;
   vector<int>::iterator it;
 
-  time_t t0; time(&t0);
-  time_t t1;
+  time_t t0, t1; time(&t0);
 
   /* process the file line by line */
   while(std::getline(infile, line)){
@@ -64,14 +63,14 @@ int main(int argc, char ** argv){
 
       for(int i = 0; i < n_f; i++){
         trim(w[i]);
-	 std::transform(w[i].begin(), w[i].end(), w[i].begin(), ::tolower); // to lower case
+        std::transform(w[i].begin(), w[i].end(), w[i].begin(), ::tolower); // to lower case
 
         if(select.count(w[i]) > 0){
           selected.push_back(i);
         }
       }
       if(w[w.size() - 1] == string("linefeed")){
-      	n_f -= 1;
+        n_f -= 1;
       }
       for(it = selected.begin(); it != selected.end(); it++){
         if(it!=selected.begin()) outfile << delim;
@@ -82,11 +81,10 @@ int main(int argc, char ** argv){
       outfile << "\n";
 
       if(w.size() != n_f){
-	      cout << "w.size()" << w.size() << endl;
-	      cout << "n_f " << n_f << endl;
-	      cout << w << endl;
-
-	      err(string("unexpected number of fields"));
+        cout << "w.size()" << w.size() << endl;
+        cout << "n_f " << n_f << endl;
+        cout << w << endl;
+        cout << "WARNING: " << (string("unexpected number of fields")) << endl;
       }
       for(it = selected.begin(); it != selected.end(); it++){
         if(it!= selected.begin()){
@@ -97,14 +95,14 @@ int main(int argc, char ** argv){
     }
 
     ci += 1;
-        if(ci % 100000 == 0){
-    	infile_pos = infile.tellg();
-	time(&t1);
-	time_t dt = t1-t0;
-	float mbps = (float)infile_pos / ((float)dt * (float)1000000.);
-	float eta = (float)dt * ((float)infile_len - (float)infile_pos) / ((float)infile_pos);
-	float p = 100. * (float)infile_pos / (float) infile_len;
-	cout << "slic %" << p << " eta: " << eta << "s MB/s " << mbps << endl;
+    if(ci % 100000 == 0){
+      infile_pos = infile.tellg();
+      time(&t1);
+      time_t dt = t1-t0;
+      float mbps = (float)infile_pos / ((float)dt * (float)1000000.);
+      float eta = (float)dt * ((float)infile_len - (float)infile_pos) / ((float)infile_pos);
+      float p = 100. * (float)infile_pos / (float) infile_len;
+      cout << "slic %" << p << " eta: " << eta << "s MB/s " << mbps << endl;
     }
   }
 

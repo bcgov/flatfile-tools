@@ -79,6 +79,13 @@ int main(int argc, char ** argv){
   for(it = desf.begin(); it != desf.end(); it++){
     desfs.insert(*it);
     if(labels.count(*it) < 1){
+      cout << "\nlabels";
+      set<str>::iterator it2;
+      for(it2 = labels.begin(); it2 != labels.end(); it2++){
+	   cout << "," << *it;
+      }
+      cout << endl;
+
       err(str("field not found in data dictionary: ") + *it);
     }
   }

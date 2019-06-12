@@ -17,7 +17,8 @@ less vague example (python) from run_select_cohort.py:
 int main(int argc, char ** argv){
   if(argc < 4) err("usage: csv_select [file to filter by] [field name] [file to filter] .. [last file to filter");
 
-  mfile f_s(string(argv[1]), "rb"); // if this was too big to keep in mem, could use rewind() to re-scan it
+  string select_filename(argv[1]); // name of file to select by
+  mfile f_s(select_filename, "rb"); // if this was too big to keep in mem, could use rewind() to re-scan it
   string s_f_name(argv[2]);
   unsigned int n_files = argc - 3;
   vector<string> file_names;
@@ -40,6 +41,8 @@ int main(int argc, char ** argv){
   vector<string> words;
 
   while(f_s.getline(s)){
+    trim(s);
+    lower(s);
     words = split(s);
 
     if(l_i == 0){
@@ -49,7 +52,7 @@ int main(int argc, char ** argv){
       for0(i, select_nf){
         if(words[i] == s_f_name){
           s_f_i = i;
-          cout << "SELECTED_FIELD_INDEX " << s_f_i << endl;
+          cout << "SELECTED_FIELD_INDEX (infile): " << s_f_i << endl;
           selected = true;
         }
       }
@@ -58,7 +61,9 @@ int main(int argc, char ** argv){
     else{
       /* lower case, just in case */
       trim(words[s_f_i]);
-      if(words[s_f_i].length() != 10){
+      if(false && words[s_f_i].length() != 10){
+	      //should check if it's studyID we're using
+
         cout << "Error: " << words << endl;
         err("wrong number of digits in id");
       }
@@ -84,13 +89,13 @@ int main(int argc, char ** argv){
     cout << "Reading file: " << file_names[j];
     mfile f_f(file_names[j], "rb");
     cout << "\t[100%]\n";
-    string ofn(file_names[j] + "_select.csv");
+    string ofn(file_names[j] + "_select-" + select_filename + ".csv");
     cout << " +w " << ofn << endl;
 
     FILE * outf = fopen(ofn.c_str(), "wb");
     if(!outf) err("failed to open output file");
 
-    string of2(file_names[j] + "_select(exclude).csv");
+    string of2(file_names[j] + "_select-" + select_filename + "-exclude-.csv");
     cout << " +w " << of2 << endl;
 
     FILE * out2 = fopen(of2.c_str(), "wb");
@@ -99,6 +104,8 @@ int main(int argc, char ** argv){
     l_i = 0;
     bool matches_this_iter = false;
     while(f_f.getline(s)){
+      trim(s);
+      lower(s);
       const char * s_c = s.c_str();
       words = split(s);
       if(l_i == 0){
@@ -106,10 +113,11 @@ int main(int argc, char ** argv){
         int selected = false;
 	/* make sure for this file, we can match the name of the appropriate field */
         for0(i, words.size()){
+	  trim(words[i]);
           if(words[i] == s_f_name){
             s_f_i = i;
             cout << words << endl;
-            cout << "SELECTED_FIELD_INDEX " << s_f_i << endl;
+            cout << "SELECTED_FIELD_INDEX (outfile): " << s_f_i << endl;
             selected = true;
           }
         }
@@ -127,7 +135,7 @@ int main(int argc, char ** argv){
           err("wrong number of fields");
         }
 	trim(words[s_f_i]);
-        if(words[s_f_i].length() != 10){
+        if(false && words[s_f_i].length() != 10){
           cout << words << endl;
 	  cout << "line number: " << l_i << endl;
           err("wrong number of digits");

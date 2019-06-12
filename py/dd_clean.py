@@ -50,8 +50,8 @@ for i in range(0, len(csvf)):
         w = lines[j].split(',')
 
         if len(w) != nf:
-            open("tmp1234.csv","wb").write(",".join(fields)+"\n"+lines[j])
-            tf = open("tmp1234.csv")
+            open("./.tmp1234.csv","wb").write(",".join(fields)+"\n"+lines[j])
+            tf = open("./.tmp1234.csv")
             reader = csv.reader(tf, dialect='my')
             hdr, w = reader
             tf.close()
@@ -84,5 +84,5 @@ for i in range(0, len(csvf)):
             err("")
 
 print "pass"
-
+a = os.system("rm -f ./.tmp1234.csv")
 a = os.system('rm -f ./dd/*.csv')

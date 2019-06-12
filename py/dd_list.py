@@ -1,4 +1,8 @@
-'''20190212 finish this when we have xlrd installed? 20190214 used R-project incarnation
+'''
+20190516 ignore the instructions below: this script needs to be followed up with dd_clean (otherwise the data is dirty)
+*****************
+
+20190212 finish this when we have xlrd installed? 20190214 used R-project incarnation
    20190501: update to accommodate multiple files with original datadictionary same file name
 current interfaces:
   python rscript.py dd_unpack.R data_dictionary_education.xlsx

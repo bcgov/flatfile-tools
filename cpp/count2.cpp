@@ -1,8 +1,6 @@
 /* 20190429 count.cpp:
 count occurence of different codes
-output one hist per file!!!
-
-need to use std::priority_queue on this!!! to finish the script  */
+output one hist per file!!! */
 #include"misc.h"
 using namespace std;
 
