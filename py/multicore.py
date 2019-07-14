@@ -1,6 +1,5 @@
 # 20190212 multicore.py run jobs using multicore
 # 20190601 tested: added flag to optionally start one process right away for every job!
-
 import os
 import sys
 import time
@@ -37,9 +36,11 @@ def cprint(s):
     global p_lock
     p_lock.acquire(); print s; p_lock.release()
 
+cprint("nworker: " + str(ncpu))
 #worker thread takes a task from the list
 def threadfun(my_id):
     global next_j, j_max, lock, threads_alive, tasks
+    job_times = []
     while True:
         # acquire lock, fetch task index
         lock.acquire()
@@ -49,8 +50,12 @@ def threadfun(my_id):
 	if(j > j_max):
 	    threads_alive -= 1
 	    return
-	# run a task
-	os.popen(tasks[j]).read()
+        # run a task: first dividing into subtasks
+        work = tasks[j].split(";")
+        for i in range(0, len(work)):
+            cprint("worker(" + str(my_id) + "): " + work[i])
+            os.popen(work[i]).read()
+        # os.popen(tasks[j]).read()
 
 # sleep while task being processed
 def wait_to_finish():
