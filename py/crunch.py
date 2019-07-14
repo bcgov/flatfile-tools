@@ -80,5 +80,3 @@ for s_i in dat: # for each studyid
     outf.write(line + "\n")
 #for i in range(0, len(words)):
 
-
-

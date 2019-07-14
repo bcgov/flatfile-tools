@@ -26,9 +26,8 @@ color = {"KNRM": "\\x1B[0m", #normal
          "BCYN": "\\x1B[36m", #cyan
          "BWHT": "\\x1B[37m"} #white
 
-
-if int(os.popen("tput colors").read().strip()) == 256:
+if True or int(os.popen("tput colors").read().strip()) == 256:
     for c in color:
         exec(c + ' = "' + color[c] + '"')
-    if __name__ == '__main__':
-        print KMAG + "ansicolor" + KYEL + "." + KGRN + "py" + KNRM
+    if True or __name__ == '__main__':
+        print(KMAG + "ansicolor" + KYEL + "." + KGRN + "py" + KNRM)

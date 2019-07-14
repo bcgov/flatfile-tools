@@ -26,7 +26,7 @@ def find(ext):
     return ret
 
 d = { }
-for e in ["~", ".swp", ".bak", ".exe", ".pyc"]:
+for e in ["~", ".swp", ".bak", ".exe", ".pyc", "__pycache__"]:
     f = find(e)
     for ff in f:
         d[ff] = ""
@@ -43,7 +43,7 @@ print("")
 if yes_no("\ndelete the above files?"):
     for f in d:
         if os.path.exists(f):
-            cmd = 'rm -f "' + f + '"'
+            cmd = 'rm -rf "' + f + '"'
             print("\t" + cmd)
             a = os.system(cmd)
             if a != 0:
