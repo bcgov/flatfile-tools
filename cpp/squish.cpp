@@ -47,7 +47,7 @@ int main(int argc, char ** argv){
         if(it == count.end()) err("failed to create key");
 
         map<string, long unsigned int>::iterator itt = count[studyid].find(code);
-	if(itt == count[studyid].end()) count[studyid][code] = 0;
+        if(itt == count[studyid].end()) count[studyid][code] = 0;
       }
       count[studyid][code] += 1;
     }

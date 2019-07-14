@@ -31,10 +31,10 @@ int main(int argc, char ** argv){
   // in an ideal implementation, logic for first row appears outside of for loop
   for(int k=0; k<row.size(); k++){
 
-  	col_index = k; //row.size() - 1;
-  	d = row[col_index];
-	trim(d);
-	if(d == "studyid" || d =="study-id" || d=="pc.studyid" || d == "de.studyid") break;
+    col_index = k; //row.size() - 1;
+    d = row[col_index];
+    trim(d);
+    if(d == "studyid" || d =="study-id" || d=="pc.studyid" || d == "de.studyid") break;
   }
   outfile << line << endl;
   if(d != "studyid" && d != "study-id" && d != "pc.studyid" && d != "de.studyid" ) err("last col field name studyid expected");
@@ -42,9 +42,9 @@ int main(int argc, char ** argv){
   // in the future we should reimplement getline to read whole file into ram if can, or use ramless, different interleaves or latencies
   while(getline(dfile, line)){
     row = split(line, ',');
-      d = row[col_index];
-      trim(d);
-      if(unique.count(d) < 1) unique[d] = line;
+    d = row[col_index];
+    trim(d);
+    if(unique.count(d) < 1) unique[d] = line;
     ci ++;
   }
   dfile.close();

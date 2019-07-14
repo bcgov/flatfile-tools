@@ -5,7 +5,6 @@ note: the program is robust to the ordering of the req'd fields */
 #include"misc.h"
 using namespace std;
 
-
 int main(int argc, char ** argv){
   int i, j;
   if(argc < 2) err("usage: unique.cpp [input file] .. [input file n]");
@@ -58,25 +57,25 @@ int main(int argc, char ** argv){
     for(i = 0; i < 4; i++) if(ind[i] == -1) err("missing a field");
 
     l_i ++; // header row is still a row
-      while(getline(dfile, line)){
-        row = split(line, ',');
-        string icd9(row[ind[3]]);
-        trim(icd9);
-        if(icd9 != string("")){
-          d = (row[ind[0]] + sep + row[ind[1]] + sep + row[ind[2]] + sep + row[ind[3]]);
-          if(unique.count(d) < 1){
-            unique.insert(d); // alternative (for map<str, unsigned long int> unique): unique[d] = row_index
-            outfile << line << endl;
-          }
-        }
-        if((++ l_i) % 100000 ==0){
-	  // good time to invoke buffer-switch for multithread
-          cout << l_i << " " << d << endl;
+    while(getline(dfile, line)){
+      row = split(line, ',');
+      string icd9(row[ind[3]]);
+      trim(icd9);
+      if(icd9 != string("")){
+        d = (row[ind[0]] + sep + row[ind[1]] + sep + row[ind[2]] + sep + row[ind[3]]);
+        if(unique.count(d) < 1){
+          unique.insert(d); // alternative (for map<str, unsigned long int> unique): unique[d] = row_index
+          outfile << line << endl;
         }
       }
-      dfile.close();
+      if((++ l_i) % 100000 ==0){
+        // good time to invoke buffer-switch for multithread
+        cout << l_i << " " << d << endl;
+      }
     }
-    cout << "writing.." << endl;
-    outfile.close();
-    return 0;
+    dfile.close();
   }
+  cout << "writing.." << endl;
+  outfile.close();
+  return 0;
+}

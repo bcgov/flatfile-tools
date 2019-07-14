@@ -53,11 +53,11 @@ int main(int argc, char ** argv){
 
     while(getline(dfile, line)){
       row = split(line, ',');
-        string d(row[ind[0]] + sep + row[ind[1]] + sep + row[ind[2]] + sep + row[ind[3]]);
-        if(unique.count(d) == 0){
-          unique[d] = row_count;
-          // cout << d << sep << row_count << endl;
-        }
+      string d(row[ind[0]] + sep + row[ind[1]] + sep + row[ind[2]] + sep + row[ind[3]]);
+      if(unique.count(d) == 0){
+        unique[d] = row_count;
+        // cout << d << sep << row_count << endl;
+      }
       row_count ++;
     }
     // while(getline)
@@ -71,7 +71,7 @@ int main(int argc, char ** argv){
     ss << it->second;
     #pragma push_macro("str")
     #undef str
-      outfile << it->first + sep + ss.str() << endl;
+    outfile << it->first + sep + ss.str() << endl;
     #pragma pop_macro("str")
     outfile.flush();
   }

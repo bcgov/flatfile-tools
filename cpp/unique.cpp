@@ -80,7 +80,7 @@ int main(int argc, char ** argv){
   }
   dfile.close();
 
-  cout << "outputting last unique lines: " << unique.size() << " of " << ci <<  endl;
+  cout << "outputting last unique lines: " << unique.size() << " of " << ci << endl;
   for(map<string, string>::iterator it = unique.begin(); it != unique.end(); it++){
     outfile << it->second << endl;
   }
