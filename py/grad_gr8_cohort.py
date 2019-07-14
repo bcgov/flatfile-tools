@@ -1,14 +1,23 @@
 # 20190430 version
 
-# grad_gr8_cohort youth_cohort.csv 4
+# run by opening C:/cygwin64/Cygwin.bat
 
+# before running, type:
+#    cd /cygdrive/r/working/bin/
+#    source bash_profile
+# then, type:
+#    cd /cygdrive/r/working/education/
+
+# grad_gr8_cohort youth_cohort.csv 4
 #  youth_cohort.csv has studyid, dob (yyyy-mm)
 
 import os, sys, math, pickle, datetime
 from misc import load_fields, assert_exists, err, run
 
 if not os.path.exists("dd") or not os.path.isdir("dd"):
-    err("expected data dictionaries (cleaned, csv) in folder ./dd/")
+    # find, extract and clean data dictionary files
+    run("dd_list")
+    run("dd_clean")
 
 # data dictionary file
 dd_reg = "dd/2019-01-09_data_dictionary_consolidation-file-january-1-1986-onwards.xlsx_registry.C.csv2"
@@ -256,7 +265,6 @@ print count
 
 # print "GRADUATION RATE %", 100. * count['YES'] / (count['YES'] + count['NO_0'] + count['NO_1'])
 # print "too young to graduate %(total)", 100.*count['N/A_1'] / (count['N/A_0'] + count['N/A_1'] + count['YES'] + count['NO_0'] + count['NO_1'])
-
 
 out_fn = "graduation_output_n" + str(number_of_years) + ".csv"
 open(out_fn, "wb").write(('\n'.join(lines)).encode())

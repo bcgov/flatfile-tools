@@ -42,3 +42,7 @@ def load_fields(args): # load records and index by studyid
         ci += 1
     print("loaded ", ci, " records")
     return dat, load_fields
+
+
+def printw(fn):
+    print("+w " + fn.strip())

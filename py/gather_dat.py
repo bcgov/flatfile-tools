@@ -20,4 +20,3 @@ for p in fn:
     if not os.path.exists(tgt[p]):
         print p, "-->", tgt[p]
         shutil.move(p, tgt[p])
-

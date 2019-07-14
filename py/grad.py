@@ -1,17 +1,15 @@
 # 20190416 version; grad concept: > grad 1 psy_pssg_cohort_20190423.csv_unnest.csv
 import os, sys, math, pickle, datetime
-from misc import load_fields, assert_exists
+from misc import load_fields, assert_exists, err, run
 # run by opening C:/cygwin64/Cygwin.bat
 
 # before running, type:
 #    cd /cygdrive/r/working/bin/
-#    source .bash_profile
+#    source bash_profile
 # then, type:
 #    cd /cygdrive/r/working/education/
-#    python graduation.py
+#    grad
 
-def error(m):
-    print("error: " + str(m)); sys.exit(1)
 
 # this script will use this flag to call itself for the second version
 v_2 = False
@@ -19,22 +17,18 @@ try:
     v_2 = True if sys.argv[1] == "2" else False
     if not v_2:
         if sys.argv[1] != "1":
-            error("argument must be 1 or 2")
+            err("argument must be 1 or 2")
 except:
     pass
 
 if len(sys.argv) < 3:
     print "Important: delete the *.p files before running, if you change the cohort file!!!"
-    error("usage:\n\tgrad [version 1 or 2: start with 1] [cohort file.csv]\nhuman should enter 1 for first parameter. Program will run itself with 2.")
-
-def assert_exists(f):
-        if not os.path.exists(f): error("file does not exist: " + str(f))
-
-if not os.path.exists("R:/working/bin/"):
-    error("path not found")
+    err("usage:\n\tgrad [version 1 or 2: start with 1] [cohort file.csv]\nhuman should enter 1 for first parameter.")
 
 if not os.path.exists("dd") or not os.path.isdir("dd"):
-    error("expected data dictionaries (cleaned, csv) in folder ./dd/")
+    # find, extract and clean data dictionary files
+    run("dd_list")
+    run("dd_clean")
 
 # data dictionary file for registry:
 dd_reg = "dd/2018-09-27_data_dictionary_consolidation-file-january-1-1986-onwards.xlsx_registry.C.csv2"; assert_exists(dd_reg)
@@ -212,7 +206,7 @@ for i in studyid: # for every studyid (call it "i")
         for dataline in dat_studcrd[i]: # sanity check to make sure the credential count is always 1
             if dataline[fdat_studcrd["credential_cnt"]] != "1":
                 print("i:" + str(i)) # crash if there is not a 1 code
-                error("found unexpected credential_cnt: " + str(dat_studcrd[i][fdat_studcrd["credential_cnt"]]))
+                err("found unexpected credential_cnt: " + str(dat_studcrd[i][fdat_studcrd["credential_cnt"]]))
         continue
     else: # didn't graduate
 

@@ -60,4 +60,3 @@ while True:
     ci += 1
     if ci % 10000 == 0:
         ttt = tt; tt = time.time(); print ci/1000, "1/2 k, S/10 k: ", tt-ttt
-

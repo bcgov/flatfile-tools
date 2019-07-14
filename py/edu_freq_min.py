@@ -118,5 +118,3 @@ def freq_min(fn):
 freq_min("dsp_rpt.dat_slice.csv_select-STUDY.csv_lookup.csv")
 freq_min("dsp_rpt.dat_slice.csv_select-CONTROL.csv_lookup.csv")
 
-
-
