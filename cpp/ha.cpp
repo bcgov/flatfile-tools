@@ -38,11 +38,10 @@ int main(int argc, char ** argv){
   unsigned char c, d;
   FILE * f = fopen(fnf_fd.c_str(), "rb");
   while(fscanf(f, "%02hhX", &c) != EOF){
-  	fprintf(g, "%c", c);
+    fprintf(g, "%c", c);
   }
   fclose(f);
   fclose(g);
-
 
   if(true){
     ofstream f(fnf_fd); f << ""; f.close();

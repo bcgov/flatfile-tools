@@ -21,7 +21,7 @@ if(start > end) return;
   vector<int> items1;  vector<int> items2;
   for(int i=0; i<items.size(); i++) items1.push_back(items[i]);
   for(int i=0; i<items.size(); i++) items2.push_back(items[i]);
-
+  
   items2.push_back(start);
   comb(items1, start + 1, end, m, combs);
   comb(items2, start + 1, end, m, combs);

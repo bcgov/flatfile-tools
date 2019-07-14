@@ -33,6 +33,8 @@ using namespace std;
 #define _cwd getcwd
 #endif
 
+void rewind(ifstream &a);
+
 #define str string
 string cwd();
 
@@ -130,6 +132,15 @@ static inline std::string trim_copy(std::string s){
   return s;
 }
 
+static inline void trim(std::string &s, char delim){
+  str ret("");
+  int end = s.size() - 1; 
+  int start = 0;
+  while(s[start] == delim) start += 1;
+  while(s[end] == delim) end -= 1;
+  s = s.substr(start, 1 + end - start);
+}
+
 #define strip trim
 
 /* convert to lower case */
@@ -145,7 +156,6 @@ static inline std::string lower_copy(std::string &s){
 
 /* get size of file pointer */
 size_t size(FILE * f);
-
 size_t fsize(string fn);
 
 // in-memory reader (writer to be implemented)
