@@ -82,7 +82,7 @@ int main(int argc, char ** argv){
       cout << "\nlabels";
       set<str>::iterator it2;
       for(it2 = labels.begin(); it2 != labels.end(); it2++){
-	   cout << "," << *it;
+        cout << "," << *it;
       }
       cout << endl;
 

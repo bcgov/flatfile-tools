@@ -63,7 +63,7 @@ GLvoid draw(int p_select){
     vec3 tx(sphere_pos[ci] - rX);
     tx.translate();
     if(p_select) glPushName(ci);
-      draw_sphere();
+    draw_sphere();
     if(p_select) glPopName();
     glPopMatrix();
     ci ++;
