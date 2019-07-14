@@ -7,18 +7,25 @@ string cwd(){
 
 /* split a string (a-la python) */
 vector<string> split(string s, char delim){
+  trim(s);
+  bool extra = (s[s.size() - 1] == delim);
   std::vector<std::string> ret;
   std::istringstream iss(s);
   std::string token;
   while(getline(iss,token,delim)) ret.push_back(token);
+
+  if(extra) ret.push_back(str(""));
   return ret;
 }
 
 /* split a string (a-la python) */
 vector<string> split(string s){
+  trim(s);
+  const char delim = ',';
+  bool extra = (s[s.size() -1] == delim);
+
   std::vector<std::string> ret;
   std::istringstream iss(s);
-  const char delim = ',';
   string token;
   while(getline(iss,token,delim)) ret.push_back(token);
 
@@ -26,9 +33,17 @@ vector<string> split(string s){
   for(it = ret.begin(); it != ret.end(); it++){
     trim(*it);
   }
+  if(extra) ret.push_back(str(""));
   return ret;
 }
 
+/*
+e.g.:
+str join_(vector<str> d){
+  const char * d = "_\0";
+  return join(d, ans);
+}
+*/
 string join(const char * delim, vector<string> s){
   string ret("");
   string d(delim);
@@ -136,4 +151,9 @@ size_t fsize(string fn){
   size_t fs = size(f);
   fclose(f);
   return fs;
+}
+
+void rewind(ifstream &a){
+  a.clear();
+  a.seekg(0);
 }
