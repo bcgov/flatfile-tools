@@ -1,3 +1,5 @@
+# 20190711 this is out of date: now should run ./setup.sh
+
 how to build/ run this code (DONE)
 
 1. make a copy of the bin folder in your private folder

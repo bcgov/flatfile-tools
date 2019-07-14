@@ -59,7 +59,7 @@ for r, d, f in os.walk(pwd):
                         n_fields, n_line = wc(p)
                         print(str(p) + "," + str(n_fields) + "," + str(n_line) + "\n")
 
-print("TOTAL Selection Size (GB)" + str(c/1000000000.))
+print("TOTAL Selection Size (GB)" + str(c/(1024. * 1024. * 1024.)) + " bytes: " + str(c) + " MB " + str(c / (1024. * 1024.)))
 print("selected file  ext. count" + str(ext))
 
 e = []
