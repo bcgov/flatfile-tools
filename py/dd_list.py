@@ -66,3 +66,5 @@ for xlf in excel:
     # need to update this line:
     dd_unpack = os.path.abspath("R:/" + whoami + "/bin/R/dd_unpack.R").replace('\\','/')
     run("rscript " + dd_unpack + " " + localf)
+
+run("dd_clean")

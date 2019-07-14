@@ -61,5 +61,3 @@ while(True):
         row.append(d.replace(",", ";"))
     of.write(",".join(row)+ "\n")
 of.close()
-
-

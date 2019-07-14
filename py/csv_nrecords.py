@@ -23,5 +23,3 @@ except:
     err("could not parse number: " + string(nrec))
 
 print "number of records: ", str(nrec)
-
-
