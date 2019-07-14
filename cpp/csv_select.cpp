@@ -3,15 +3,15 @@
 use this for filtering a dataset for a specific cohort (represented by studyid in another file)
 
 less vague example (python) from run_select_cohort.py:
-   import os
-   import sys
-   files = open("msp_files.txt").read().strip().split("\n")
-   for f in files:
-   	cmd = "csv_select cohort.csv_studyid studyid " + f
-	print cmd
-	a = os.system(cmd)
+import os
+import sys
+files = open("msp_files.txt").read().strip().split("\n")
+for f in files:
+cmd = "csv_select cohort.csv_studyid studyid " + f
+print cmd
+a = os.system(cmd)
 
-  */
+*/
 #include"misc.h"
 
 int main(int argc, char ** argv){
@@ -62,7 +62,7 @@ int main(int argc, char ** argv){
       /* lower case, just in case */
       trim(words[s_f_i]);
       if(false && words[s_f_i].length() != 10){
-	      //should check if it's studyID we're using
+        //should check if it's studyID we're using
 
         cout << "Error: " << words << endl;
         err("wrong number of digits in id");
@@ -111,9 +111,9 @@ int main(int argc, char ** argv){
       if(l_i == 0){
         nf = words.size();
         int selected = false;
-	/* make sure for this file, we can match the name of the appropriate field */
+        /* make sure for this file, we can match the name of the appropriate field */
         for0(i, words.size()){
-	  trim(words[i]);
+          trim(words[i]);
           if(words[i] == s_f_name){
             s_f_i = i;
             cout << words << endl;
@@ -125,7 +125,7 @@ int main(int argc, char ** argv){
 
         /* write the header */
         fwrite(s_c, strlen(s_c), 1, outf);
-	fwrite(s_c, strlen(s_c), 1, out2); // 20190310 add support for "excluded" set
+        fwrite(s_c, strlen(s_c), 1, out2); // 20190310 add support for "excluded" set
       }
       else{
         /* qc or data integrity checking. should have specific scripts to do this. */
@@ -134,28 +134,28 @@ int main(int argc, char ** argv){
           cout << "line number: " << l_i << endl;
           err("wrong number of fields");
         }
-	trim(words[s_f_i]);
+        trim(words[s_f_i]);
         if(false && words[s_f_i].length() != 10){
           cout << words << endl;
-	  cout << "line number: " << l_i << endl;
+          cout << "line number: " << l_i << endl;
           err("wrong number of digits");
         }
         if(id.count(words[s_f_i]) > 0){
           fprintf(outf, "\n%s", s_c);
           matches_this_iter = true;
-	  //id_linked.insert(w_s_f_i);
-	  n_matches ++;
+          //id_linked.insert(w_s_f_i);
+          n_matches ++;
         }
-	else{
-  	  fprintf(out2, "\n%s", s_c);
-	}
+        else{
+          fprintf(out2, "\n%s", s_c);
+        }
 
       }
       if((++ l_i) % 1000000 ==0){
         f_f.status();
         cout << words << string(" wsfi: ") << words[s_f_i] << (matches_this_iter?string(" true"):string(" false")) << endl;
         fflush(outf);
-	matches_this_iter = false;
+        matches_this_iter = false;
       }
     }
     f_f.close();

@@ -14,11 +14,8 @@ The output will match the input, with an additional col. inserted.. for the look
 int main(int argc, char ** argv){
   if(argc < 3) err("usage: csv_lookup [lookup file] [file to apply lookup to]");
   cout << "Opening file: " << argv[1] << endl;
-
   mfile l_f(string(argv[1]), "rb"); // if this was too big to keep in mem, could use rewind() to re-scan it
-
   cout << "Opening file: " << argv[2] << endl;
-
   mfile d_f(string(argv[2]), "rb"); // data file..
 
   unsigned int i;
@@ -105,9 +102,8 @@ int main(int argc, char ** argv){
           fprintf(f, ",N/A");
           count_na ++;
           cout << words << endl;
-	  fprintf(g, "%s\n", s.c_str());
+          fprintf(g, "%s\n", s.c_str());
         }
-
       }
     }
     fprintf(f, "\n");

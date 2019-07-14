@@ -22,10 +22,9 @@ int main(int argc, char ** argv){
   vector<str> words;
   ifstream dfile(fn);
   long unsigned int infile_pos;
-    dfile.seekg (0, dfile.end);
-      long unsigned int infile_len = dfile.tellg();
-        dfile.seekg (0, dfile.beg);
-
+  dfile.seekg (0, dfile.end);
+  long unsigned int infile_len = dfile.tellg();
+  dfile.seekg (0, dfile.beg);
 
   getline(dfile, line);
   vector<str> fields = split(line);

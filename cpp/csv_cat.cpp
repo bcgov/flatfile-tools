@@ -19,7 +19,7 @@ int main(int argc, char ** argv){
     trim(header);
     if(i == 0) header0 = header;
     if(header0 != header){
-       cout << "error: file :" << filenames[i] << " header:\n\t" << header << " didn't match first header: \n\t" << header0 << endl;
+      cout << "error: file :" << filenames[i] << " header:\n\t" << header << " didn't match first header: \n\t" << header0 << endl;
       bad_header = true;
     }
 
