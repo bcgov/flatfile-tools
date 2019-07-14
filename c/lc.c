@@ -1,5 +1,5 @@
-/* 20190602  use C to count lines in a file that have some non-space character in them..
-    ..similar but distinct from "wc -l" in linux */
+/* 20190602 use C to count lines in a file that have some non-space character in them..
+..similar but distinct from "wc -l" in linux */
 #include"misc.h"
 #include"string.h"
 #define MAXCHAR 1024*1024

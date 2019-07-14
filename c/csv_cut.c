@@ -1,7 +1,7 @@
 // 20190302 cut.cpp: cut out any line of the csv where FIELD also appears in FIELD for the cohort (selection) file
 #include"misc.h"
 
-#define HEAD_ONLY false //true   //false  //true
+#define HEAD_ONLY false //true //false //true
 #define HEAD_N 100
 
 int main(int argc, char ** argv){
@@ -81,7 +81,7 @@ int main(int argc, char ** argv){
           x->key = (char *) alloc_tmp(sizeof(char) * (sl + 1));
           for(m = 0; m < sl + 1; m ++) x->key[m] = words[h_fi][m];
           x->key[ sl ] = '\0';
-	  trim(x->key);
+          trim(x->key);
           tsearch(x, &root, compare); // insert
           free_split(words, h_nf);
         }
@@ -208,23 +208,23 @@ int main(int argc, char ** argv){
             void * r = tfind(x, &root, compare); // insert
             if(r){
               // match
-	      fprintf(of_keep, "%s\n", line);
+              fprintf(of_keep, "%s\n", line);
             }
             else{
               // nomatch
-	      fprintf(of_toss, "%s\n", line);
+              fprintf(of_toss, "%s\n", line);
             }
-	    free(x);
-	  }
-	  else{
-            str_map  x;
+            free(x);
+          }
+          else{
+            str_map x;
             x.key = words[c_fi];
             void * r = tfind(&x, &root, compare); // insert
             if(r){
               // match
-	      fprintf(of_keep, "%s\n", line);
+              fprintf(of_keep, "%s\n", line);
             }
-	  }
+          }
           free_split(words, n_cf);
         }
       }

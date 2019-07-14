@@ -67,31 +67,31 @@ int main(int argc, char ** argv) {
         if(cd > 0) cout << ",";
         cout << (*it) ;
         cd ++;
-        }
-      	cout <<std::endl;
       }
-      ci += 1;
-      if(ci % 10000 ==0){
-        int p = (int) (100. * (float)(infile.tellg()) / (float)(fsize));
-        if(p > percentage ){
-          percentage = p;
-          cout << percentage << std::endl;
-        }
+      cout <<std::endl;
+    }
+    ci += 1;
+    if(ci % 10000 ==0){
+      int p = (int) (100. * (float)(infile.tellg()) / (float)(fsize));
+      if(p > percentage ){
+        percentage = p;
+        cout << percentage << std::endl;
       }
     }
-    cout << "counting..." << std::endl;
-    for(mi = line_by_id.begin(); mi != line_by_id.end(); mi++){
-      string s_id(mi->first);
-      string line(mi->second);
-      std::vector<std::string> w(split(line, ','));
-      incr(w[0]); //first field: behaviour code
-      incr(w[1]); //second field: gender code
-      incr(w[0] + std::string(",") + w[1]); //co-occurence code
-    }
-
-    /* output */
-    for(std::map<std::string, unsigned long int>::iterator i=counts.begin(); i!=counts.end(); i++){
-      std::cout << i->first <<"," << i->second << std::endl;
-    }
-    return 0;
   }
+  cout << "counting..." << std::endl;
+  for(mi = line_by_id.begin(); mi != line_by_id.end(); mi++){
+    string s_id(mi->first);
+    string line(mi->second);
+    std::vector<std::string> w(split(line, ','));
+    incr(w[0]); //first field: behaviour code
+    incr(w[1]); //second field: gender code
+    incr(w[0] + std::string(",") + w[1]); //co-occurence code
+  }
+
+  /* output */
+  for(std::map<std::string, unsigned long int>::iterator i=counts.begin(); i!=counts.end(); i++){
+    std::cout << i->first <<"," << i->second << std::endl;
+  }
+  return 0;
+}

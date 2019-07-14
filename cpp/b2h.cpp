@@ -36,7 +36,7 @@ int main(int argc, char ** argv){
     system((str("rm -f ") + fnf_fnp).c_str());
     exit(0);
   }
-  printf("%s%d%s\n\n    ", KNRM, f_p, KGRN);
+  printf("%s%d%s\n\n ", KNRM, f_p, KGRN);
   unsigned long int l_i, c_i;
   l_i = c_i = 0;
   fseek(f, f_p, SEEK_SET);
@@ -45,7 +45,7 @@ int main(int argc, char ** argv){
     printf("%.2X", (unsigned char)c);
     if(++c_i % 32 == 0){
       if(++ l_i > 32) break;
-      printf("\n    ");
+      printf("\n ");
     }
   }
   ofstream g(fnf_fnp);
