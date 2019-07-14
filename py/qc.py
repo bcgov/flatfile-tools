@@ -26,4 +26,3 @@ while True:
     nfl = nf
     #if ci > 500:
     #    break
-
