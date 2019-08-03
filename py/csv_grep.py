@@ -6,17 +6,17 @@ from misc import *
 if len(sys.argv) < 3:
     err("usage: csv_grep [pattern] [input csv file]")
 
-pattern = sys.argv[1]
-filename = sys.argv[2]
-
-a = os.system("grep " + pattern + " " + filename + " > " + filename + "_grep")
-if a != 0:
-    err("grep failed")
+pattern, filename = sys.argv[1], sys.argv[2]
+grep_file = filename + "_grep" # grep results go here
+a = os.system("grep " + pattern + " " + filename + " > " + grep_file)
 
 f = open(filename)
 fields = f.readline().strip() + "\n"
-open(filename + "_fields", "wb").write(fields)
+f.close()
+fields_file = filename + "_fields" # names of fields go in this file
+open(fields_file, "wb").write(fields)
 
-a = os.system("cat " + filename + "_fields " + filename + "_grep > " + filename + "_grep_" + pattern + ".csv")
-if a != 0:
-    err("cat failed")
+a = os.system("cat " + fields_file + " " + grep_file + " > " + filename + "_grep_" + pattern + ".csv")
+run("rm -f " + grep_file)
+run("rm -f " + fields_file)
+
