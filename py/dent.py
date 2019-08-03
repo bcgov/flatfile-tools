@@ -77,7 +77,7 @@ for i in range(0, len(lines)):
     last_char = None
     last_chars = None
     try:
-        last_char = line[-2:]
+        last_chars = line[-2:]
     except:
         pass
 
