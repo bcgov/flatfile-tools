@@ -12,6 +12,7 @@
 
 #include<map>
 #include<set>
+#include<queue>
 #include<vector>
 #include<string>
 #include<sstream>
@@ -41,7 +42,7 @@ string cwd();
 /* split a string (a-la python) */
 vector<string> split(string s, char delim);
 vector<string> split(string s); // comma
-
+vector<string> split_special(string s); // comma with possible commas inside quotation marks!
 string join(const char * delim, vector<string> s);
 
 template<class T> std::ostream& operator << (std::ostream& os, const std::vector<T>& v){
@@ -65,9 +66,9 @@ template<class T> std::ostream& operator << (std::ostream& os, const std::set<T>
 template<class A, class B> std::ostream& operator << (std::ostream& os, const std::map<A, B>& v){
   os << "{" << endl;
   for (typename std::map<A, B>::const_iterator ii = v.begin(); ii != v.end(); ++ii){
-    os << ii->first << "," << ii->second << endl;
+    os << ii->first << ":" << ii->second << ","; //endl;
   }
-  os << "}";
+  os << "}" << endl;
   return os;
 }
 
@@ -114,19 +115,19 @@ static inline void trim(std::string &s){
   rtrim(s);
 }
 
-// trim from start (copying)
+// trim from start (copying): not implemented properly
 static inline std::string ltrim_copy(std::string s){
   ltrim(s);
   return s;
 }
 
-// trim from end (copying)
+// trim from end (copying): not implemented properly
 static inline std::string rtrim_copy(std::string s){
   rtrim(s);
   return s;
 }
 
-// trim from both ends (copying)
+// trim from both ends (copying): not implemented properly
 static inline std::string trim_copy(std::string s){
   trim(s);
   return s;
