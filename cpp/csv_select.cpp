@@ -13,7 +13,7 @@ a = os.system(cmd)
 
 */
 #include"misc.h"
-
+#include<cmath>
 int main(int argc, char ** argv){
   if(argc < 4) err("usage: csv_select [file to filter by] [field name] [file to filter] .. [last file to filter");
 
@@ -86,9 +86,12 @@ int main(int argc, char ** argv){
   unsigned long int n_matches = 0;
   for0(j, n_files){
     unsigned int nf = 0; // number of fields, this file
-    cout << "Reading file: " << file_names[j];
-    mfile f_f(file_names[j], "rb");
-    cout << "\t[100%]\n";
+    cout << "Reading file: " << file_names[j] << endl;
+    ifstream f_f;
+    f_f.open(file_names[j]);
+    if(!f_f.is_open()) err(str("failed to open input file: ") + file_names[j]);
+    //mfile f_f(file_names[j], "rb");
+    //cout << "\t[100%]\n";
     string ofn(file_names[j] + "_select-" + select_filename + ".csv");
     cout << " +w " << ofn << endl;
 
@@ -103,7 +106,10 @@ int main(int argc, char ** argv){
 
     l_i = 0;
     bool matches_this_iter = false;
-    while(f_f.getline(s)){
+    size_t f_siz = fsize(file_names[j]);
+
+    while(getline(f_f, s)){
+	    //f_f.getline(s)){
       trim(s);
       lower(s);
       const char * s_c = s.c_str();
@@ -114,11 +120,20 @@ int main(int argc, char ** argv){
         /* make sure for this file, we can match the name of the appropriate field */
         for0(i, words.size()){
           trim(words[i]);
-          if(words[i] == s_f_name){
-            s_f_i = i;
-            cout << words << endl;
-            cout << "SELECTED_FIELD_INDEX (outfile): " << s_f_i << endl;
-            selected = true;
+          vector<str> ws(split(words[i], '.'));
+          if(ws.size() > 1){
+            if(ws[ws.size() - 1] == s_f_name){
+              s_f_i = i;
+              selected = true;
+            }
+          }
+          else{
+            if(words[i] == s_f_name){
+              s_f_i = i;
+              cout << words << endl;
+              cout << "SELECTED_FIELD_INDEX (outfile): " << s_f_i << endl;
+              selected = true;
+            }
           }
         }
         if(!selected) err("failed to find selected field"); // this should happen before we do the work.
@@ -130,9 +145,12 @@ int main(int argc, char ** argv){
       else{
         /* qc or data integrity checking. should have specific scripts to do this. */
         if(words.size() != nf){
-          cout << words << endl;
-          cout << "line number: " << l_i << endl;
-          err("wrong number of fields");
+          words = split_special(s);
+          if(words.size() != nf){
+            cout << words << endl;
+            cout << "Unexpected number of fields (" << words.size() << ") at line number: " << l_i << " expected #: " << nf << endl;
+            err("Remediation failed: wrong number of fields");
+          }
         }
         trim(words[s_f_i]);
         if(false && words[s_f_i].length() != 10){
@@ -143,7 +161,6 @@ int main(int argc, char ** argv){
         if(id.count(words[s_f_i]) > 0){
           fprintf(outf, "\n%s", s_c);
           matches_this_iter = true;
-          //id_linked.insert(w_s_f_i);
           n_matches ++;
         }
         else{
@@ -151,10 +168,9 @@ int main(int argc, char ** argv){
         }
 
       }
-      if((++ l_i) % 1000000 ==0){
-        f_f.status();
-        cout << words << string(" wsfi: ") << words[s_f_i] << (matches_this_iter?string(" true"):string(" false")) << endl;
-        fflush(outf);
+      if((++l_i) % 100000 ==0){
+        size_t p = f_f.tellg();
+        cout << "%" << 100. * float(p) / float(f_siz) << " match %" << ceil(100. * float(n_matches) / float(l_i -1)) << endl;
         matches_this_iter = false;
       }
     }
