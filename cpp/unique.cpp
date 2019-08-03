@@ -3,15 +3,13 @@
 using namespace std;
 
 int main(int argc, char ** argv){
-  if(argc < 2) err("usage: unique.cpp [input file] [field 1] ... [field n]:");
+  if(argc < 2) err("usage:\n\tunique.cpp [input file] [field 1] ... [field n]\n\tdefault: all fields");
+  int n_fields = argc - 2; // number of fields to filter on
 
-  // number of fields to filter on
-  int n_fields = argc - 2;
-
-  // input file to filter
-  string dfn(argv[1]);
+  string dfn(argv[1]); // input file to filter
   ifstream dfile(dfn);
   if(!dfile.is_open()) err(string("failed to open input data file:") + dfn);
+  size_t total_size = fsize(dfn);
 
   // cols to filter on
   set<str> d;
@@ -36,9 +34,9 @@ int main(int argc, char ** argv){
   cout << "data output file: " << ofn << endl;
 
   string line;
+  size_t last_p = 0;
   vector<string> row;
   long unsigned int ci = 0;
-  unsigned int col_index = 0;
   map<string, string> unique;
 
   // get the field names
@@ -61,30 +59,49 @@ int main(int argc, char ** argv){
   set<int>::iterator it;
   // in the future we should reimplement getline to read whole file into ram if can, or use ramless, different interleaves or latencies
   while(getline(dfile, line)){
-    row = split(line, ',');
-    str idx("");
-    ii = 0;
-    for(it = indices.begin(); it != indices.end(); it++){
-      if(ii == 0){
-        idx += str(",");
+    trim(line);
+    if(n_fields == 0){
+      lower(line);
+      if(unique.count(line) < 1){
+        unique[line] = line;
       }
-      idx += (row[*it]);
-      ii += 1;
     }
-    trim(idx);
-    lower(idx);
-    if(unique.count(idx) < 1){
-      unique[idx] = line;
+    else{
+      row = split(line, ',');
+      str idx("");
+
+      ii = 0;
+      for(it = indices.begin(); it != indices.end(); it++){
+        if(ii == 0){
+          idx += str(",");
+        }
+        idx += (row[*it]);
+        ii += 1;
+      }
+      trim(idx);
+      lower(idx);
+      if(unique.count(idx) < 1){
+        unique[idx] = line;
+      }
+    }
+    if(ci % 100000 == 0){
+      size_t p = dfile.tellg();
+      cout << "%" << 100. * float(p) / float(total_size);
+      cout << endl;
+      last_p = p;
     }
     ci ++;
   }
   dfile.close();
 
   cout << "outputting last unique lines: " << unique.size() << " of " << ci << endl;
+  ci = 0;
   for(map<string, string>::iterator it = unique.begin(); it != unique.end(); it++){
     outfile << it->second << endl;
+    if(++ci % 100000 == 0){
+      cout << "%" << 100. * float(ci) / float(unique.size()) << endl;
+    }
   }
   outfile.close();
-
   return 0;
 }
