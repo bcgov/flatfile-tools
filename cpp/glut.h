@@ -1,28 +1,71 @@
 /* g++ graphics.cpp -lopengl32 -lglu32 -lgdi32
 test opengl graphics without any extra drivers or libraries */
-#include<GL/gl.h>
-#include<GL/glu.h>
-#include<windows.h>
-#include<fstream>
-#include<iostream>
+#include<set>
+#include<stack>
+#include"misc.h"
+#include<vector>
 #include<math.h>
 #include<cfloat>
-#include<set>
-#include<vector>
+#include<GL/gl.h>
+#include<fstream>
+#include<iostream>
+#include<GL/glu.h>
+#include<stdlib.h>
+#include<windows.h>
+#include<pthread.h>
 using namespace std;
 
+int cur_data_file;
+vector<str> data_files;
+void cluster();
+
+
+class d_idx{
+  // distance + index tuple object
+  public:
+  float d;
+  long unsigned int idx;
+  d_idx(float _d, long unsigned int _idx){
+    d = _d;
+    idx = _idx;
+  }
+  d_idx(const d_idx &a){
+    d = a.d;
+    idx = a.idx;
+  }
+};
+
+bool operator<(const d_idx& a, const d_idx&b){
+  return a.d > b.d; // priority_queue is max first
+}
+
+// stuff for distance-matrix calculation
+str hdr; // csv fields
+vector<str> csv; // comma-separated input data
+str * data;
+
+
+int skip_factor;
+long unsigned int next_j;
+pthread_attr_t attr; // specify threads joinable
+pthread_mutex_t print_mutex;
+pthread_mutex_t next_j_mutex;
+float * dmat;
+
+
 /* Windows globals, defines, and prototypes */
-CHAR window_name[]="glut";
 HDC ghDC;
 HGLRC ghRC;
 HWND ghWnd;
+CHAR window_name[]="glut";
 
 #define SWAPBUFFERS SwapBuffers(ghDC)
 #define MAXBUFFERSIZE 1024
 
-#define ARROWHEAD_LENGTH 0.25
-#define ARROWHEAD_WIDTH 0.175
-#define SPHERE_RADIUS 0.25
+
+#define SPHERE_RADIUS 0.015 // this needs to be dynamic with the size of the stuff
+#define ARROWHEAD_LENGTH (0.25 * SPHERE_RADIUS)
+#define ARROWHEAD_WIDTH (0.175 * SPHERE_RADIUS)
 
 class vec3{
   public:
@@ -39,7 +82,7 @@ class vec3{
     x=a.x; y=a.y; z=a.z;
   }
 
-  vec3( const vec3 & other){
+  vec3(const vec3 & other){
     x = other.x; y = other.y; z = other.z;
   }
   vec3 & operator=( vec3 & rhs ){
@@ -82,6 +125,17 @@ class vec3{
     vec3* ret = new vec3( x/s, y/s ,z/s);
     return *ret;
   }
+  vec3 &operator +=(vec3 rhs){
+    x += rhs.x; 
+    y += rhs.y;
+    z += rhs.z;
+  }
+  vec3 &operator -=(vec3 rhs){
+    x -= rhs.x;
+    y -= rhs.y;
+    z -= rhs.z;
+  }
+
   float length(){
     return sqrt( x*x +y*y +z*z);
   }
@@ -97,13 +151,10 @@ class vec3{
   inline void translate(){
     glTranslatef(x, y, z);
   }
-
   inline void zero(){
     x = y = z = 0.;
   }
-
-}
-;
+};
 
 vec3 rX;
 void draw_sphere(){
@@ -141,6 +192,7 @@ vector<vec3> arrow_col;
 int SHIFT_KEY;
 int CONTROL_KEY;
 
+// int rMouseX, rMouseY; // 20190712 added to compensate for an annoying effect
 float myLeft, myRight, myBottom, myTop, myZNear, myZFar;
 int _mouseX,_mouseY, _mouseLeft, _mouseMiddle, _mouseRight;
 double _left,_right, _top,_bottom,_near,_far,_zNear,_zFar, _dragPosX, _dragPosY, _dragPosZ;
@@ -189,8 +241,7 @@ BOOL bSetupPixelFormat(HDC hdc){
     PFD_MAIN_PLANE, // main layer
     0, // reserved
     0, 0, 0 // layer masks ignored
-  }
-  ;
+  };
 
   int pixelformat;
   pixelformat = ChoosePixelFormat(hdc, &pfd);
@@ -210,80 +261,7 @@ void getMatrix();
 void processHits(GLint hits, GLuint buffer[]);
 void zprPick(GLdouble x, GLdouble y,GLdouble delX, GLdouble delY);
 
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
-
-  rX.zero();
-  SHIFT_KEY = false;
-
-  _mouseLeft = _mouseRight = false;
-
-  for(int i=0; i<4; i++) zprReferencePoint[i] = 0.;
-
-  _mouseX = 0;
-  _mouseY = 0;
-  _mouseLeft = 0;
-  _mouseMiddle = 0;
-  _mouseRight = 0;
-  _dragPosX = 0.0;
-  _dragPosY = 0.0;
-  _dragPosZ = 0.0;
-  myLeft= 0.;//FLT_MAX;
-  myRight=0.;//FLT_MIN;
-  myBottom=0.;//FLT_MAX;
-  myTop=0.;//FLT_MIN;
-  myZNear= -10.;//0.;
-  myZFar=10.;//1.;
-
-  set_width(500);
-  set_height(500);
-
-  zprReferencePoint[0] = 0.;
-  zprReferencePoint[1] = 0.;
-  zprReferencePoint[2] = 0.;
-  zprReferencePoint[3] = 0.;
-  getMatrix();
-
-  MSG msg;
-  WNDCLASS wndclass;
-
-  /* Register the frame class */
-  wndclass.style = 0;
-  wndclass.lpfnWndProc = (WNDPROC)MainWndProc;
-  wndclass.cbClsExtra = 0;
-  wndclass.cbWndExtra = 0;
-  wndclass.hInstance = hInstance;
-  wndclass.hIcon = LoadIcon (hInstance, window_name);
-  wndclass.hCursor = LoadCursor (NULL,IDC_ARROW);
-  wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-  wndclass.lpszMenuName = window_name;
-  wndclass.lpszClassName = window_name;
-
-  if(!RegisterClass(&wndclass)) return FALSE;
-
-  /* Create the frame */
-  ghWnd = CreateWindow (window_name, "OpenGL", WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, CW_USEDEFAULT, CW_USEDEFAULT, WIDTH, HEIGHT, NULL, NULL, hInstance, NULL);
-
-  /* make sure window was created */
-  if (!ghWnd) return FALSE;
-
-  /* show and update main window */
-  ShowWindow (ghWnd, nCmdShow);
-  UpdateWindow (ghWnd);
-
-  /* animation loop */
-  while (1) {
-    while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) == TRUE){
-      if (GetMessage(&msg, NULL, 0, 0) ){
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-      }
-      else{
-        return TRUE;
-      }
-    }
-    drawScene(false);
-  }
-}
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 
 void setOrthographicProjection() {
   int h = HEIGHT;
@@ -325,9 +303,9 @@ GLvoid draw(int p_select);
 
 void zprMotion(GLint x, GLint y){
   bool changed = false;
-  const int dx = x - _mouseX;
-  const int dy = y - _mouseY;
-  if( dx==0 and dy==0) return;
+  int dx = x - _mouseX;
+  int dy = y - _mouseY;
+  if(dx == 0 and dy == 0) return;
 
   GLint viewport[4];
   glGetIntegerv(GL_VIEWPORT,viewport);
@@ -336,64 +314,76 @@ void zprMotion(GLint x, GLint y){
 
   if(CONTROL_KEY && _mouseLeft){
     if(myPickNames.size() == 1){
-    set<GLint>::iterator it = myPickNames.begin();
-    // glPlottable * a = (* (myGraphicsAsAFunctionOfGLName.find( *it ))).second;
+      set<GLint>::iterator it = myPickNames.begin(); // glPlottable * a = (* (myGraphicsAsAFunctionOfGLName.find( *it ))).second;
 
-    vec3 * a = &sphere_pos[*it]; // sphere centre coord, for name *it
+      vec3 * a = &sphere_pos[*it]; // sphere centre coord, for name *it
+      GLdouble proj[16]; // vars
+      GLdouble model[16];
+      GLint view[4];
+      GLdouble nearx,neary,nearz;
 
-    GLdouble proj[16]; // vars
-    GLdouble model[16];
-    GLint view[4];
-    GLdouble nearx,neary,nearz;
+      // proj., model, view mats
+      glGetDoublev(GL_PROJECTION_MATRIX,proj);
+      glGetDoublev(GL_MODELVIEW_MATRIX,model);
+      glGetIntegerv(GL_VIEWPORT,view);
 
-    // proj., model, view mats
-    glGetDoublev(GL_PROJECTION_MATRIX,proj);
-    glGetDoublev(GL_MODELVIEW_MATRIX,model);
-    glGetIntegerv(GL_VIEWPORT,view);
+      float screendx = (float)x - (float)_mouseX;
+      float screendy = (float)y - (float)_mouseY;
+      double mx, my, mz, vx, vy, vz;
+      mx = (double) a->x;
+      my = (double) a->y;
+      mz = (double) a->z;
 
-    float screendx=(float)x-(float)_mouseX;
-    float screendy=(float)y-(float)_mouseY;
-    // cout << "pick i: " << *it << " drag " <<  screendx <<","<<screendy<<".." << endl;
-    double mx, my, mz, vx, vy, vz;
-    mx = (double) a->x; //a->x.x; //_GetX();
-    my = (double) a->y;//a->x.y; //GetY();
-    mz = (double) a->z;//a->x.z; //GetZ();
+      //world xyz onto screen xyz
+      gluProject(mx,my,mz,model,proj,view,&vx,&vy,&vz);
 
-    //world xyz onto screen xyz
-    gluProject(mx,my,mz,model,proj,view,&vx,&vy,&vz);
+      float screeny = vy - screendy; // - (float)screeny;
+      float screenx = vx + screendx;
 
-    float screeny = vy - screendy; // - (float)screeny;
-    float screenx = vx + screendx;
+      //screen xyz onto world xyz
+      gluUnProject(screenx, screeny, vz, model,proj,view,&nearx,&neary,&nearz);
+      vec3 newa((float)nearx - mx, (float)neary -my, (float)nearz-mz);
+      vec3 translation(a->x + newa.x, a->y + newa.y, a->z + newa.z);
+      a->x = translation.x;
+      a->y = translation.y;
+      a->z = translation.z;
 
-    //screen xyz onto world xyz
-    gluUnProject(screenx, screeny, vz, model,proj,view,&nearx,&neary,&nearz);
-    vec3 newa((float)nearx - mx, (float)neary -my, (float)nearz-mz);
-    vec3 translation(a->x + newa.x, a->y + newa.y, a->z + newa.z);
-    a->x = translation.x;
-    a->y = translation.y;
-    a->z = translation.z;
-
-    draw(false);
-	//SWAPBUFFERS;
-    // a->Update = true; glutPostRedisplay(); display(); glutSwapBuffers();
-    _dragPosX = px;
-    _dragPosY = py;
-    _dragPosZ = pz;
-    _mouseX = x;
-    _mouseY = y;
-    changed = true;
+      draw(false); //SWAPBUFFERS; a->Update = true; glutPostRedisplay(); display(); glutSwapBuffers();
+      _dragPosX = px;
+      _dragPosY = py;
+      _dragPosZ = pz;
+      _mouseX = x;
+      _mouseY = y;
+      changed = true;
     }
   }
   else{
     if(myPickNames.size() < 1){
       if(_mouseLeft && _mouseRight){
+	// zoom
         double s = exp((double)dy*0.01);
         glTranslatef( zprReferencePoint[0], zprReferencePoint[1], zprReferencePoint[2]);
         glScalef(s,s,s);
         glTranslatef(-zprReferencePoint[0],-zprReferencePoint[1],-zprReferencePoint[2]);
         changed = true;
       }
+      else if(_mouseRight){
+	// pan
+	if(true){
+          //double px,py,pz;
+          glMatrixMode(GL_MODELVIEW);
+          //pos(&px,&py,&pz,x,y,viewport);
+          glLoadIdentity();
+          glTranslatef(px-_dragPosX,py-_dragPosY,pz-_dragPosZ);
+          glMultMatrixd(_matrix);
+          _dragPosX = px;
+	  _dragPosY = py;
+	  _dragPosZ = pz;
+          changed = true;
+	}
+      }
       else if(_mouseLeft){
+	// rotate
         double ax,ay,az,bx,by,bz,angle;
         ax = dy;
         ay = dx;
@@ -408,25 +398,12 @@ void zprMotion(GLint x, GLint y){
         glTranslatef(-zprReferencePoint[0],-zprReferencePoint[1],-zprReferencePoint[2]);
         changed = true;
       }
-      else if(_mouseRight){
-        double px,py,pz;
-        glMatrixMode(GL_MODELVIEW);
-        pos(&px,&py,&pz,x,y,viewport);
-        glLoadIdentity();
-        glTranslatef(px-_dragPosX,py-_dragPosY,pz-_dragPosZ);
-        glMultMatrixd(_matrix);
-        _dragPosX = px; _dragPosY = py; _dragPosZ = pz;
-        changed = true;
-      }
-          _mouseX = x;
-    _mouseY = y;
+      _mouseX = x;
+      _mouseY = y;
     }
-
   }
-
   if(changed){
-    getMatrix();
-    //SWAPBUFFERS; ////glutPostRedisplay();
+    getMatrix(); //SWAPBUFFERS; ////glutPostRedisplay();
   }
 }
 
@@ -530,15 +507,15 @@ GLint mouseX, mouseY;
 
 /* main window procedure */
 LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-  GLint mouseX, mouseY;
+  RECT rect;
   LONG lRet = 1;
   PAINTSTRUCT ps;
-  RECT rect;
+  GLint mouseX, mouseY;
 
-   mouseX = LOWORD(lParam);
-   mouseY = HIWORD(lParam);
+  mouseX = LOWORD(lParam);
+  mouseY = HIWORD(lParam);
 
-  switch (uMsg) {
+  switch(uMsg){
     case WM_CREATE:
     ghDC = GetDC(hWnd);
     if (!bSetupPixelFormat(ghDC))
@@ -576,12 +553,36 @@ LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     PostQuitMessage(0);
     break;
 
+    /* 
+     int cur_data_file;
+vector<str> data_files;
+     * */
+
     case WM_KEYDOWN:{
       switch (wParam) {
         case VK_SHIFT: SHIFT_KEY = true; break;
         case VK_CONTROL: CONTROL_KEY = true; break;
-        case VK_LEFT: break;
-        case VK_RIGHT: break;
+        case VK_LEFT:
+			 if(cur_data_file > 0){
+				 cur_data_file -= 1;
+				 cout << "cur_data_file --" << endl;
+				 cluster();
+			 }
+			 else{
+				 cout << "cur_data_file " << cur_data_file << endl;
+			 }
+			 break;
+        case VK_RIGHT:
+			 if(cur_data_file < data_files.size() -1){
+			   cur_data_file += 1;
+			   cout << "cur_data_file ++" << endl;
+			   cluster();
+			 }
+			 else{
+				 cout << "cur_data_file " << cur_data_file << endl;
+			 }
+
+			 break;
         case VK_UP: break;
         case VK_DOWN: break;
         case VK_ESCAPE: exit(1);
@@ -591,7 +592,8 @@ LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     cout <<"key press: " << wParam << endl;
     break;
 
-    case WM_KEYUP:{
+    case WM_KEYUP:
+    if(true){
       switch (wParam) {
         case VK_SHIFT: SHIFT_KEY = false; break;
         case VK_CONTROL: CONTROL_KEY = false; break;
@@ -605,7 +607,8 @@ LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 
     break;
 
-    case WM_LBUTTONDOWN:{
+    case WM_LBUTTONDOWN:
+    if(true){
       _mouseLeft = true;
       mouseX = LOWORD(lParam);
       mouseY = HIWORD(lParam);
@@ -621,24 +624,43 @@ LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     }
     break;
 
-    case WM_RBUTTONDOWN: _mouseRight = true;
-    mouseX = LOWORD(lParam);
-    mouseY = HIWORD(lParam);
+    case WM_RBUTTONDOWN:
+    if(true){
+      _mouseRight = true;
+      mouseX = LOWORD(lParam);
+      mouseY = HIWORD(lParam);
+      GLint x = mouseX;
+      GLint y = mouseY;
+      GLint viewport[4]; //zprPick(mouseX,HEIGHT-1-mouseY,3,3);
+      glGetIntegerv(GL_VIEWPORT,viewport);
+      pos(&_dragPosX,&_dragPosY,&_dragPosZ,x,y,viewport);
+    }
     break;
-    case WM_LBUTTONUP: _mouseLeft = false;
-    mouseX = LOWORD(lParam);
-    mouseY = HIWORD(lParam);
-    myPickNames.clear();
+
+    case WM_LBUTTONUP:
+    if(true){
+      _mouseLeft = false;
+      mouseX = LOWORD(lParam);
+      mouseY = HIWORD(lParam);
+      myPickNames.clear();
+    }
     break;
-    case WM_RBUTTONUP: _mouseRight = false;
-    mouseX = LOWORD(lParam);
-    mouseY = HIWORD(lParam);
+
+    case WM_RBUTTONUP:
+    if(true){
+      _mouseRight = false;
+      mouseX = LOWORD(lParam);
+      mouseY = HIWORD(lParam);
+
+    }
     break;
 
     case WM_MOUSEMOVE:
-    mouseX = LOWORD(lParam);
-    mouseY = HIWORD(lParam);
-    zprMotion(mouseX, mouseY);
+    if(true){
+      mouseX = LOWORD(lParam);
+      mouseY = HIWORD(lParam);
+      zprMotion(mouseX, mouseY);
+    }
     break;
 
     case WM_MOUSEWHEEL:
@@ -653,28 +675,18 @@ LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 }
 
 void reset_view(){
-
-  _mouseX = 0;
-  _mouseY = 0;
-  _mouseLeft = 0;//false;
-  _mouseMiddle = 0;//false;
-  _mouseRight = 0;//false;
-  _dragPosX = 0.0;
-  _dragPosY = 0.0;
-  _dragPosZ = 0.0;
   rX.init(0., 0., 0.);
-  zprReferencePoint[0] = 0.;
-  zprReferencePoint[1] = 0.;
-  zprReferencePoint[2] = 0.;
-  zprReferencePoint[3] = 0.;
+  _mouseX = _mouseY = 0;
+  _mouseLeft = _mouseMiddle = _mouseRight = 0;
+  _dragPosX = _dragPosY = _dragPosZ = 0.0;
+  zprReferencePoint[0] = zprReferencePoint[1] = zprReferencePoint[2] = zprReferencePoint[3] = 0.;
   getMatrix();
-
 }
 
 void processHits(GLint hits, GLuint buffer[]){
-  myPickNames.clear();
-
+  
   unsigned int i, j;
+  myPickNames.clear();
   GLuint names, *ptr, minZ,*ptrNames, numberOfNames;
   if(hits <=0 ) return;
   //printf ("hits = %d names:{", hits);
@@ -686,17 +698,15 @@ void processHits(GLint hits, GLuint buffer[]){
     ptr++;
     GLint mindepth = *ptr; ptr++;
     GLint maxdepth = *ptr; ptr++;
-    for(j=0; j<names; j++){
-      GLint name = *ptr;
-      // printf(",%d",name);
-      if(name>=0){
+    for(j = 0; j < names; j++){
+      GLint name = *ptr; // printf(",%d",name);
+      if(name >= 0){
         myPickNames.insert(name);
         if(SHIFT_KEY) rX = sphere_pos[name];
       }
       ptr++;
     }
   }
-  //printf ("}\n");
 }
 
 GLvoid draw(int p_select);
@@ -729,15 +739,17 @@ void zprPick(GLdouble x, GLdouble y,GLdouble delX, GLdouble delY){
 
   draw(true);
 
-    // Draw the scene in selection mode
-    hits = glRenderMode(GL_RENDER); /* Return to normal rendering mode */
-    processHits( hits, buffer);
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix(); /* Restore projection matrix */
-    glMatrixMode(GL_MODELVIEW);
-    return;
-  }
+  // Draw the scene in selection mode
+  hits = glRenderMode(GL_RENDER); /* Return to normal rendering mode */
+  processHits( hits, buffer);
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix(); /* Restore projection matrix */
+  glMatrixMode(GL_MODELVIEW);
+  return;
+}
 
-  class glPlottable{
 
-    };
+
+class glPlottable{
+
+};
