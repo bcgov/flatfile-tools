@@ -6,7 +6,7 @@ def err(m):
     sys.exit(1)
 
 def run(cmd):
-    print("run(" + cmd + ")")
+    print('  run("' + cmd + '")')
     a = os.system(cmd)
     if a != 0:
         err("command [" + cmd + "] failed with code: " + str(a))
@@ -46,3 +46,6 @@ def load_fields(args): # load records and index by studyid
 
 def printw(fn):
     print("+w " + fn.strip())
+
+
+args = sys.argv
