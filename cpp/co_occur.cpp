@@ -5,36 +5,52 @@
 //---------------------------------------------------------------------------//
 #include<map>
 #include<set>
+#include"misc.h"
 #include<vector>
 #include<string>
 #include<sstream>
 #include<fstream>
 #include<iostream>
-#include"misc.h"
 #include"n_choose_m.h"
-
 using namespace std;
 
 /* statistical co-occurence */
 std::map<std::string, long unsigned int> counts;
 
+class count_idx{
+  // date, file pointer tuple object
+  public:
+  str item;
+  long unsigned int count;
+  count_idx(str i = str(""), long unsigned int c = 0){
+    item = i;
+    count = c;
+  }
+  count_idx(const count_idx &a){
+    item = a.item;
+    count = a.count;
+  }
+};
+
+bool operator<(const count_idx& a, const count_idx&b){
+  return a.count < b.count; // priority_queue is max first
+}
+
 /* count string occurrences */
-void incr(std::string label){
-
-  /* are we tracking this label yet? */
-  std::map<std::string, long unsigned int>::iterator ci = counts.find(label);
-
-  if(ci == counts.end()){
-    /* if not, init count */
-    counts[label] = 1;
+inline void incr(std::string label){
+  if(counts.find(label) == counts.end()){
+    counts[label] = 0;
   }
-  else{
-    /* increase count */
-    counts[label] += 1;
-  }
+  counts[label] += 1;
 }
 
 int main(int argc, char ** argv){
+
+  if(argc < 2){
+	  cout << "co_occur.cpp: default field selection: all" << endl;
+    err("co_occur [input file.csv] [optional selected field 1] .. [optional selected field n]");
+  }
+  int i;
   int s_s = 3; // selection size;
   std::string filename(argv[1]);
   std::ifstream infile(filename);
@@ -46,74 +62,80 @@ int main(int argc, char ** argv){
 
   set<string> select;
   if(argc >= 3){
-    for(int i=2; i < argc; i++){
+    for(i = 2; i < argc; i++){
       select.insert(argv[i]);
     }
   }
-  cout << select << endl;
-
   vector<int> select_i;
 
   /* process the file line by line */
-
+  cout << "combinations:" << endl;
   vector<vector<int>> combs;
   vector<vector<int>>::iterator it;
   for(it= combs.begin(); it!=combs.end(); it++){
     cout << *it << endl;
   }
-  while(std::getline(infile, line)){
 
-    /* split csv line into separate fields */
-    std::vector<std::string> w(split(line, ','));
 
-    if(ci == 0){
-      fields = w;
+  getline(infile, line);
+  std::vector<std::string> w(split(line, ','));
+  fields = w;
       n_f = w.size();
-      cout << select << endl;
-
-      if(select.size()>0){
-        for(int i=0; i<n_f; i++){
-          if(select.count(fields[i]) >0){
+      if(select.size() > 0){
+        for0(i, n_f){
+          if(select.count(fields[i]) > 0){
             select_i.push_back(i);
           }
         }
+        combs = n_choose_up_to_m(select_i.size(), s_s);
+      }
+      else combs = n_choose_up_to_m(n_f, s_s); 
+  
+  while(std::getline(infile, line)){
+    w = split(line, ',');
 
-        combs = n_choose_up_to_m(select_i.size(),s_s); // fill this in..
-      }
-      else{
-        combs = n_choose_up_to_m(n_f,s_s); // fill this in..
-      }
-    }
-    else{
       if(w.size() != n_f){
-        cout << "Error: " << std::endl; return -1;
+        cout << "Error: unexpected # of fields " << std::endl; return -1;
       }
-    }
+    
     vector<string> w_f;
-    if(select.size()>0){
-      for(int i=0; i<select_i.size(); i++){
+    if(select.size() > 0){
+      for0(i, select_i.size()){
         w_f.push_back(w[select_i[i]]);
       }
     }
     else w_f = w;
 
-    for(it=combs.begin(); it!=combs.end(); it++){
+    for(it = combs.begin(); it != combs.end(); it++){
       string s("");
-      for(vector<int>::iterator i=it->begin(); i!=it->end(); i++){
-        if(i!=it->begin()){
+      for(vector<int>::iterator ti = it->begin(); ti != it->end(); ti++){
+        if(ti != it->begin()){
           s += string(",");
         }
-        s += w_f[*i];
+        s += w_f[*ti];
       }
       incr(s);
     }
     ci += 1;
   }
 
+  priority_queue<count_idx> pq;
+
   /* output string counts */
-  for(std::map<std::string, unsigned long int>::iterator i=counts.begin(); i!=counts.end(); i++){
-    std::cout << i->first << "," << i->second << std::endl;
+  for(std::map<std::string, unsigned long int>::iterator ti=counts.begin(); ti!=counts.end(); ti++){
+    pq.push(count_idx(ti->first, ti->second));
+   }
+
+  cout << "code_length,count,count" << endl;
+  while(!pq.empty()){
+     count_idx x(pq.top());
+     pq.pop();
+     str item(x.item);
+	
+     cout <<  split(item).size()  << "," << x.count << ",\""  << item << "\"" << std::endl;
+
   }
+
 
   return 0;
 }

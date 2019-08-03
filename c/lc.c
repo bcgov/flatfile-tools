@@ -6,7 +6,7 @@
 
 int main(int argc, char ** argv){
   if(argc < 2){
-    printf("lc.c: row count for file\n\tUsage: lc [filename]\n");
+    printf("lc.c: non-white row count for file\n\tUsage: lc [filename]\n");
     exit(1);
   }
   FILE *fp;
@@ -20,7 +20,6 @@ int main(int argc, char ** argv){
   }
 
   long int lc = 0;
-  bool had_nonspace;
   unsigned int i;
   while(fgets(str, MAXCHAR, fp)){
     for(i = 0; i < strlen(str); i++){
