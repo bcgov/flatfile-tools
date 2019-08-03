@@ -18,9 +18,15 @@ if(start > end) return;
     return;
   }
 
+  int i;
   vector<int> items1;  vector<int> items2;
-  for(int i=0; i<items.size(); i++) items1.push_back(items[i]);
-  for(int i=0; i<items.size(); i++) items2.push_back(items[i]);
+  for0(i, items.size()){
+	  items1.push_back(items[i]);
+  }
+
+  for0(i, items.size()){
+	  items2.push_back(items[i]);
+  }
   
   items2.push_back(start);
   comb(items1, start + 1, end, m, combs);
@@ -34,7 +40,7 @@ vector< vector<int> > n_choose_m(int n, int m){
 	return combs;
 }
 
-vector< vector<int> > n_choose_up_to_m(int n, int m){
+vector<vector<int>> n_choose_up_to_m(int n, int m){
 	vector<int> s;
 	vector<vector<int>> ret;
 	for(int i=1; i<=m; i++){
