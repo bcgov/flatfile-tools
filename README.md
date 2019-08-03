@@ -2,25 +2,10 @@
 Scripts for effective "flat file" data wrangling; python, C/C++ and R syntax leveraged. Python3 now supported for building
 
 # requirements
-Presently the scripts are tested for Cywin ("linux for Windows" platform) with gnu g++ and python installed, under a Windows 10 environment. Build script is now updated for Python 3! Hope to support Mac OS, Windows/MinGW, Ubuntu soon
+Presently the scripts are tested for Cywin ("linux for Windows" platform) with gnu g++ and python installed, under a Windows 10 environment
 
 # Instructions
-1. At a cygwin terminal (c:/cygwin64/Cygwin.bat) in Windows with gnu g++ and python installed, type:
-
->**source bash_profile**
-to add the compiled code to the system path.
-
-2) Type:
-
->**python setup.py**
-
-to compile the programs.
-
-Alternately, for example:
-
->**python setup.py dd_slice_apply**
-
-could be used to compile a single program (in this case, dd_slice_apply.cpp)
+Place a copy of the files in a folder named /bin in your private folder and click on bash.bat
 
 ## License
 
