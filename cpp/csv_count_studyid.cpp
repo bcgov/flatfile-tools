@@ -1,4 +1,6 @@
 #include"misc.h"
+// 2019 07 24 should update this program to identify the studyid col
+//
 int main(int argc, char** argv){
   if(argc < 2) err("count_studyid.cpp: usage: count_studyid [input file, csv, last col STUDYID");
   string fn(argv[1]);
