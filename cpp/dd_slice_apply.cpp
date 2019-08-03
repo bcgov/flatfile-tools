@@ -63,6 +63,7 @@ int main(int argc, char ** argv){
       label.push_back(w[3]);
       label_lookup[w[3]] = ci - 1; // field index: field line number less one
       if(atoi(w[1].c_str()) + 1 - atoi(w[0].c_str()) != atoi(w[2].c_str())){
+	     cout <<w << endl;
         err("length mismatch error");
       }
     }
@@ -85,7 +86,6 @@ int main(int argc, char ** argv){
         cout << "," << *it;
       }
       cout << endl;
-
       err(str("field not found in data dictionary: ") + *it);
     }
   }
@@ -93,14 +93,21 @@ int main(int argc, char ** argv){
   /* linefeed not a thing */
   if(label.back() == str("LINEFEED")) label.pop_back();
 
-  cout << start << endl << stop << endl << length << endl << label << endl;
+  cout << "start" << start << endl << "stop" << stop << endl << "length" << length << endl << label << endl;
+  unsigned int total_len = 0;
+  for(vector<int>::iterator it = length.begin(); it != length.end(); it++){
+    total_len += *it;
+  }
+  cout << "total length: " << total_len << endl;
+
+  
   cout << "applying data dictionary.." << endl;
 
   ifstream dfile(dtf);
   if(!dfile.is_open()) err(str("failed to open input data file:") + dtf);
 
   /* calculate file size */
-  long unsigned int dfile_pos, dfile_len;
+  long unsigned int dfile_pos, dfile_len, dfile_pos_last;
   dfile.seekg(0, dfile.end);
   dfile_len = dfile.tellg();
   dfile.seekg(0, dfile.beg);
@@ -129,30 +136,37 @@ int main(int argc, char ** argv){
   vector<str> row;
   time_t t0, t1; time(&t0);
 
-  /* the getline and analytics needs be wrapped in mfile; mfile needs to encapsulate loading depending on memory availability?
-  multithreaded chunking? */
+  /* multithreaded chunking? */
   while(getline(dfile, line)){
     for0(i, n_f){
       d = line.substr(dstart[i] - 1, dlength[i]);
       strip(d);
-      replace(d.begin(), d.end(), ',', ';');
+      std::replace(d.begin(), d.end(), ',', ';');
       row.push_back(d);
     }
     outfile << str("\n") + join(",", row);
-    if(ci % 100000 == 0){
+    if(++ci % 100000 == 0){
       time(&t1);
       time_t dt = t1-t0;
       dfile_pos = dfile.tellg();
       float p = 100. * (float)dfile_pos / (float) dfile_len;
-      float mbps = (float)dfile_pos / ((float)dt * (float)1000000.);
+      float mbps = (float)(dfile_pos)/ ((float)dt * (float)(1024*1024));// * (float)1000000.);
       float eta = (float)dt * ((float)dfile_len - (float)dfile_pos) / ((float)dfile_pos);
-      cout << "ddsa %" << p << " eta: " << eta << "s MB/s " << mbps << endl;
+      cout << "ddsa %" << p << " eta: " << eta << "s MB/s " << mbps << endl; // " dt=" << dt << endl;
+      dfile_pos_last = dfile_pos;
     }
     row.clear();
-    ci ++;
   }
+  cout << "exit" << endl;
 
   free(dstart);
   free(dlength);
+
+  ofstream rc;
+  rc.open(dtf + str(".rc"));
+  if(!rc.is_open()) err(str("failed to open .rc file"));
+  rc << "n_records_sliced,n_records_total" << endl;
+  rc << ci << "," << ci << endl;
+  rc.close();
   return 0;
 }
