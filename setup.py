@@ -9,11 +9,6 @@ job_file = open("compile_jobs.sh", "wb")
 def add_job(cmd):
     job_file.write((cmd + "\n").encode())
 
-# need to be able to detect python, R, and vim (if exist)
-# need to do the wrapping (as we did for py) for R programs, too!
-# CHECK ON writing (and executing) the bash_profile..
-# 20190401 this program now compatible with python3
-
 sys_s, sys_n = os.popen("uname -a").read().strip().lower(), None
 if sys_s[0:6] == 'cygwin': sys_n = 'cygwin'
 elif sys_s[0:5] == 'mingw': sys_n = 'mingw'
@@ -36,30 +31,32 @@ profile = ['alias vim="/cygdrive/c/Program\ Files\ \(x86\)/Vim/vim81/vim.exe"',
            'alias Rscript="/cygdrive/c/Program\ Files/R/R-3.5.2/bin/Rscript.exe"',
            'alias python="/cygdrive/c/Program\ Files/Python35/python/" #alias python="/cygdrive/c/Python27/python.exe"',
            'export PATH="$PATH:$(pwd)"']
-#try:
-#    open('./.bash_profile','wb').write(('\n'.join(profile)).encode())
-#    f_contents = open('./.bash_profile').read().strip()
-#    os.popen('source ./.bash_profile')
-#except:
-#    print("warning: not sure if we could set environment variables")
 
 compiled = {}
+line_count = 0
 
 def compile(f):
+    global line_count
+    try:
+        line_count += int(os.popen("lc " + f.strip()).read().strip())
+    except:
+        pass
     # print(KRED + f.strip('./') + KGRN)
     global build, compiled
     ext = f.strip().split('.')[-1].strip()
     fn = f.split('/')[-1].strip().split('.')[0]
     # print("fn", fn)
-    if ext == 'py' and build is not None and build != fn: return
+    if ext == 'py' and build is not None and build != fn:
+        return
 
     # don't compile helper funcs as a binary; no main()
-    if fn == "misc" or fn == "__init__" or fn == "wrap_py": return
+    if fn == "misc" or fn == "__init__" or fn == "wrap_py":
+        return
 
-    if not fn in compiled: compiled[fn] = True
-    else: return
-
-    # print(KRED + f.strip('./') + KGRN)
+    if not fn in compiled:
+        compiled[fn] = True
+    else:
+        return
 
     cmds = ""
     if ext == 'c' or ext == 'cpp':
@@ -79,7 +76,6 @@ def compile(f):
                  '#include<string>',
                  'using namespace std;',
                  'int main(int argc, char ** argv){',
-                 #'  string cmd("/cygdrive/c/Program\\\\ Files/Python35/python.exe ");',
                  '  string cmd("/cygdrive/c/Python27/python.exe ");',
                  '  cmd += string("R:/' + os.popen("whoami").read().strip() + '/bin/py/' + fn + '.py");',
                  '  for(int i=1; i<argc; i++){',
@@ -103,14 +99,34 @@ def compile(f):
 
     add_job(cmds)
 
-# find source files and compile
-cpp = os.popen('find ./cpp/ -name "*.cpp"').read().strip().split('\n')
-py = os.popen('find ./py/ -name "*.py"').read().strip().split('\n')
-c = os.popen('find ./c/ -name "*.c"').read().strip().split('\n')
-n = len(cpp) + len(py) + len(c)
+if not build:
+    # find source files and compile
+    cpp = os.popen('find ./cpp/ -name "*.cpp"').read().strip().split('\n')
+    py = os.popen('find ./py/ -name "*.py"').read().strip().split('\n')
+    c = os.popen('find ./c/ -name "*.c"').read().strip().split('\n')
+    n = len(cpp) + len(py) + len(c)
 
-for f in py: compile(f)
-for f in c: compile(f)
-for f in cpp: compile(f)
+    for f in py:
+        compile(f)
+    for f in c:
+        compile(f)
+    for f in cpp:
+        compile(f)
+else:
+    print("build", build)
+    c_file = 'c/' + build + '.c'
+    cpp_file = 'cpp/' + build + '.cpp'
+    py_file = 'py/' + build + '.py'
+    if exists(cpp_file):
+        compile(cpp_file)
+    elif exists(c_file):
+        compile(c_file)
+    elif exists(py_file):
+        compile(py_file)
+    else:
+        err("failed to find file for: " + build)
+
 
 job_file.close()
+print("line_count " + str(line_count))
+
