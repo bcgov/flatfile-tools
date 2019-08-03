@@ -1,6 +1,6 @@
 # 20190711
-echo setting up environment..
-source bash_profile
+#echo setting up environment..
+#source bash_profile
 echo building command list..
 /cygdrive/c/Program\ Files/Python35/python.exe setup.py > /dev/null
 echo compiling multicore compiler..
