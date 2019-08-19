@@ -2,7 +2,7 @@
 Scripts for effective "flat file" data wrangling; python, C/C++ and R syntax leveraged. Python3 now supported for building
 
 # requirements
-Presently the scripts are tested for Cywin ("linux for Windows" platform) with gnu g++ and python installed, under a Windows 10 environment
+Presently the scripts are tested for Cywin ("linux for Windows" platform) with gnu g++ and python 2 and 3 both installed, under a Windows 10 environment
 
 # Instructions
 Place a copy of the files in a folder named /bin in your private folder and click on bash.bat
