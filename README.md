@@ -1,6 +1,7 @@
 # csv
 Scripts for wrangling arbitrarily large "flat files"; python 2 and 3, C/C++ and R syntax are leveraged. Python3 now supported for building
-
+* conversion from fixed-width format to csv
+* slicing and other manipulations for tables too large to manipulate in EXCEL
 # requirements
 Presently the scripts are tested for Cywin ("linux for Windows" platform) with gnu g++ and python 2 and 3 both installed, under a Windows 10 environment
 
