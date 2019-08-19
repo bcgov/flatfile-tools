@@ -1,4 +1,4 @@
-# flatfile
+# flatfile_tools
 Scripts for wrangling arbitrarily large tables AKA "flat files"; python 2 and 3, C/C++ and R syntax are leveraged. Python3 now supported for building
 * conversion from fixed-width format to csv
 * parsing, slicing and some statistics manipulations included
