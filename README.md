@@ -2,7 +2,7 @@
 Scripts for wrangling arbitrarily large tables AKA "flat files"; python 2 and 3, C/C++ and R syntax are leveraged. Python3 now supported for building
 * conversion from fixed-width format to csv
 * parsing, slicing and some statistics manipulations included
-* robustness to extremely large file sizes (tested with 100's of GB)
+* robustness to extremely large file sizes (tested with csv files 100's of GB in size)
 
 # requirements
 Presently the scripts are tested for Cywin ("linux for Windows" platform) with gnu g++ and python 2 and 3 both installed, under a Windows 10 environment
