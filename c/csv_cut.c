@@ -1,4 +1,5 @@
 // 20190302 cut.cpp: cut out any line of the csv where FIELD also appears in FIELD for the cohort (selection) file
+// this script needs to be deprecated
 #include"misc.h"
 
 #define HEAD_ONLY false //true //false //true
