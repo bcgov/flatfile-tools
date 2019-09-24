@@ -1,8 +1,9 @@
-from misc import *
+from misc import * # using a module
+
+if len(args) < 2:
+    err("pnet_get [cohort file name, 1-col csv with header]")
 
 cohort_file = args[1]
-
-run("dd_list") # find, extract and clean all data dictionaries 
 
 files = ['dsp_rpt.dat',
         'clm_rpt_1995_2000.dat',
@@ -11,26 +12,27 @@ files = ['dsp_rpt.dat',
         'clm_rpt_2011_2014.dat',
         'clm_rpt_2015_2018.dat']
 
-# get one file
-run('df_get ' + 'hlth_prod_final.dat')
+run("dd_list") # find and clean all data dictionaries
 
-# convert to csv
-run('dd_sliceapply_all hlth_prod_final.dat')
+h_file = 'hlth_prod_final.dat'
+if not exists(h_file + '_dd_sliceapply.csv'):
+    run('df_get ' + h_file)
+    run('dd_sliceapply_all ' + h_file)
 
-# for each pnet file:
+csv = []
+
 for f in files:
-    # get the data zip and unzip it
-    run("df_get " + f)
+    csv.append(f + '_dd_sliceapply_cohort.csv')
 
-    # convert to csv (cohort data only)
-    run("dd_sliceapply_all " + f + " " + cohort_file)
-    
-    # clean up files
-    run("rm -f *.dat *.gz")
+    if not exists(csv[-1]):
+        run("df_get " + f)
+        run("dd_sliceapply_all " + f + " " + cohort_file)
 
-# make a list of the output csv files from the last step
-csv_files = [f + '_dd_sliceapply.csv' for f in files]
+        # clean up files
+        run("rm -f *.dat *.gz")
 
-# this program actually looks in all the different files for fields that are in common, and merges the data together (common fields only)
-run("csv_cat_common_fields " + " ".join(csv_files))
+        # data cleaning
+        run('pnet_check ' + csv[-1])
 
+run("csv_cat_common_fields " + " ".join([cf + '_clean' for cf in csv]))
+run("mv csv_cat_common_fields.csv pnet.csv")
