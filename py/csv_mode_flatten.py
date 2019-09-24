@@ -24,7 +24,7 @@ fields = line.split(","); n_f = len(fields)
 fields = [f.strip().lower() for f in fields]
 if not 'studyid' in fields:
     err("study id field expected")
-s_f_i = -1 # 
+s_f_i = -1 #
 for i in range(0, len(fields)):
     if fields[i] == 'studyid':
         s_f_i = i
