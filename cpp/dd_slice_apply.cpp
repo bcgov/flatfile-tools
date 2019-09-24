@@ -63,7 +63,7 @@ int main(int argc, char ** argv){
       label.push_back(w[3]);
       label_lookup[w[3]] = ci - 1; // field index: field line number less one
       if(atoi(w[1].c_str()) + 1 - atoi(w[0].c_str()) != atoi(w[2].c_str())){
-	     cout <<w << endl;
+        cout <<w << endl;
         err("length mismatch error");
       }
     }
@@ -100,7 +100,6 @@ int main(int argc, char ** argv){
   }
   cout << "total length: " << total_len << endl;
 
-  
   cout << "applying data dictionary.." << endl;
 
   ifstream dfile(dtf);
