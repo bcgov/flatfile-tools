@@ -32,8 +32,8 @@ for i in range(0, len(files)):
     if not os.path.exists(fn):
         err("input file not found: " + fn)
     ext = fn.split(".")[-1]
-    if ext != "csv":
-        err("input file required to be csv: " + fn)
+    #if ext != "csv":
+    #    err("input file required to be csv: " + fn)
     f = open(fn)
     hdr.append(f.readline().strip().split(","))
     line1 = f.readline().strip().split(",")
@@ -105,7 +105,7 @@ for i in range(0, len(files)):
 
 cumulative_f_size, t_0 = 0, time.time()
 
-# process input file-by-file
+# process input file-by-file and retain common cols only
 for i in range(0, len(files)):
     # retrive
     fn, i_sf = files[i], i_sf_i[i]
@@ -118,7 +118,7 @@ for i in range(0, len(files)):
     i_use = []
     for j in range(0, len(match_fields)):
         mf = match_fields[j]
-        i_use.append(sf_i[mf])
+        i_use.append(sf_i[mf]) # list of indices to be selected
 
     # sanity check
     if len(i_use) != len(match_fields):
@@ -130,12 +130,16 @@ for i in range(0, len(files)):
     line = in_f.readline() # header
     ci = 0
     ci_last, t_last, c_f_last = None, None, None
+
+    # actual activity of program is below this line:
+
     while True:
-        line = in_f.readline()
+        line = in_f.readline() # read a line of the file
         if not line: break # exit read loop if end-of-file
         words = line.strip().split(',')
         f.write('\n' + ','.join([words[j] for j in i_use]))
 
+        # below this line is just the progress bar...
         if ci % 500000 == 0:
             t = time.time()
             c_f = in_f.tell() + cumulative_f_size
