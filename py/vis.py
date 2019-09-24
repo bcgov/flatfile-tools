@@ -8,5 +8,3 @@ if len(sys.argv) < 2:
 open("./.vis", "wb").write(",".join(sys.argv[1:]))
 
 run("glut")
-
-
