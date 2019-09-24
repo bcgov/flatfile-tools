@@ -42,7 +42,7 @@ for f in sorted(recent_datfile_names.keys()): #recent_datfile_names:
     rc_file = dat_file_name + ".rc"
     slice_file = dat_file_name + "_dd_sliceapply_cohort.csv"
     select_file = dat_file_name + "_select-" + cohort_file_name + ".csv"
-    
+
     print dat_file_name
     print "\tgz file", fn
     print "\tgzfile short", file_name
@@ -88,11 +88,11 @@ for f in sorted(recent_datfile_names.keys()): #recent_datfile_names:
     # make a local copy of the file if it doesn't exist
     if not os.path.exists(file_name):
         run("cp " + fn + " " + file_name)
- 
+
     # unzip the file
     if not os.path.exists(dat_file_name):
         run("unzp " + file_name)
-    
+
     # need to check datfile_name counts!
 
     if not os.path.exists(dat_file_name):
@@ -137,9 +137,9 @@ for f in sorted(recent_datfile_names.keys()): #recent_datfile_names:
             # do a fast grep for single pattern
             my_id = cohort_data[1].strip()
             run("csv_grep " + my_id + " " + dat_file_name)
-            tmpf = dat_file_name + "_grep_" + my_id + ".csv" 
+            tmpf = dat_file_name + "_grep_" + my_id + ".csv"
             run("mv -v " + tmpf + " " + select_file)
-                   
+
         if not os.path.exists(select_file):
             err("couldn't find output from csv_select")
         records_selected = int(os.popen("lc " + select_file).read().strip()) - 1
@@ -182,7 +182,3 @@ for f in sorted(recent_datfile_names.keys()): #recent_datfile_names:
 
     if os.path.exists(dat_file_name):
         run("rm -f " + dat_file_name)
-    
-
-
-
