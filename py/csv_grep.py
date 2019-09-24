@@ -19,4 +19,3 @@ open(fields_file, "wb").write(fields)
 a = os.system("cat " + fields_file + " " + grep_file + " > " + filename + "_grep_" + pattern + ".csv")
 run("rm -f " + grep_file)
 run("rm -f " + fields_file)
-
