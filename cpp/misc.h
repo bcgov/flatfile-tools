@@ -10,6 +10,9 @@
 
 #define STR_MAX 16384
 
+#define mtx_lock pthread_mutex_lock
+#define mtx_unlock pthread_mutex_unlock
+
 #include<map>
 #include<set>
 #include<queue>
@@ -197,4 +200,52 @@ class mfile{
   // e.g, [ab, ac] --> a[b,c]
   // [abc, ac] --> a[b[c],c]
   //
+  //
+  //
+  
+// float-int tuple for sorting distances
+class f_i{
+  public:
+  float f;
+  size_t i;
+  f_i(float g = 0., size_t h = 0){
+    // constructor. 0-index is null
+    f = g;
+    i = h;
+  }
+  f_i(const f_i &a){
+    // copy constructor
+    f = a.f;
+    i = a.i;
+  }
+};
+
+bool operator < (const f_i &a, const f_i &b);
+
+/*
+ 
+// float-int tuple for sorting distances
+class f_ij{
+  public:
+  float f;
+  size_t i,j;
+  f_ij(float f_ =0, size_t i_=0, size_t j_=0){
+    // constructor. 0-index is null
+    f = f_;
+    i = i_;
+    j = j_;
+    cout << " fij(" << f << "," << i << "," << j << ")" << endl;
+  }
+  f_ij(const f_ij &a){
+    // copy constructor
+    f = a.f;
+    i = a.i;
+    j = a.j;
+   cout << "*fij(" << f << "," << i << "," << j << ")" << endl;
+  }
+};
+
+bool operator < (const f_ij &a, const f_ij &b);
+*/
+
   #endif
