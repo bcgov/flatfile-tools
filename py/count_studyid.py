@@ -22,7 +22,7 @@ def count_id(fn):
 
     while True:
         line = f.readline()
-        if not line: 
+        if not line:
             break
         words = line.strip().split(",")
 
