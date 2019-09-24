@@ -9,7 +9,7 @@ datafiles = []
 recent_datfile_names = {}
 
 if not os.path.exists("datafiles.p"):
-    pwd = "R:/DATA/" 
+    pwd = "R:/DATA/"
     # traverse present filesystem tree
     for root, folder, files in os.walk(pwd):
         for f in files:
@@ -48,7 +48,7 @@ if not os.path.exists("recent_datfile_names.p"):
                 if mtime[d] > mtime[maxi]: maxi = d
             ci += 1
         if debug:
-            print("\t**** " + str(mtime[maxi]) + " " + str(maxi)) 
+            print("\t**** " + str(mtime[maxi]) + " " + str(maxi))
         recent_datfile_names[datfile_name] = maxi
     pickle.dump([recent_datfile_names], open("recent_datfile_names.p", "wb"))
 else:
