@@ -20,5 +20,3 @@ for i in range(0, len(dat)):
         out_lines.append(','.join(w))
 
 open(fn, 'w').write('\n'.join(out_lines))
-
-
