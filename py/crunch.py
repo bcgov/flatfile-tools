@@ -79,4 +79,3 @@ for s_i in dat: # for each studyid
         line += "," + (",".join([count[0][0], first, last, str(n), str(len(count))]))
     outf.write(line + "\n")
 #for i in range(0, len(words)):
-
