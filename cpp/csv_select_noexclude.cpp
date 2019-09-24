@@ -32,7 +32,7 @@ int main(int argc, char ** argv){
 
   unsigned int i;
   for0(i, n_files){
-	 cout << "  r " << argv[i + 3] << endl;
+    cout << " r " << argv[i + 3] << endl;
     file_names.push_back(string(argv[i + 3]));
     FILE * f = fopen(argv[i + 3], "rb");
     if(!f) err("failed to open file");
@@ -143,7 +143,7 @@ int main(int argc, char ** argv){
 
       if((++l_i) % 100000 ==0){
         size_t p = f_f.tellg();
-        cout << "%" << 100. * float(p) / float(f_siz) << " matches " << n_matches << endl; //  << ceil(100. * float(n_matches) / float(l_i -1)) << endl;
+        cout << "%" << 100. * float(p) / float(f_siz) << " matches " << n_matches << endl; // << ceil(100. * float(n_matches) / float(l_i -1)) << endl;
         matches_this_iter = false;
       }
     }
