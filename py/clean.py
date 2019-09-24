@@ -40,11 +40,18 @@ for f in d:
 
 print("")
 
+cmds = []
 if yes_no("\ndelete the above files?"):
     for f in d:
         if os.path.exists(f):
             cmd = 'rm -rf "' + f + '"'
-            print("\t" + cmd)
-            a = os.system(cmd)
-            if a != 0:
-                err("failed to delete file: " + f)
+            cmds.append(cmd)
+            #
+            #print("\t" + cmd)
+            #a = os.system(cmd)
+            #if a != 0:
+            #    err("failed to delete file: " + f)
+
+open("clean_jobs.sh", "wb").write("\n".join(cmds))
+run("multicore clean_jobs.sh")
+run("rm -f clean_jobs.sh") # clean up
