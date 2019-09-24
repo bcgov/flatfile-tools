@@ -46,10 +46,9 @@ while i < len(dat):
                 out_dat = ",".join([str(start_pos), str(end_pos), str(n_char), name])
                 o_f.write('\n' + out_dat)
                 start_pos = end_pos + 1
-            
+
             # pssg file doesn't count EOF / LINEFEED. Here we follow the convention used elsewhere
             out_dat = ",".join([str(end_pos + 1), str(end_pos + 1), str(1), 'LINEFEED'])
             o_f.write('\n' + out_dat)
             o_f.close()
     i += 1
-
