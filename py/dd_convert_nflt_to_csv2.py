@@ -67,5 +67,3 @@ except:
 
 if len(out_dat.lower().split('studyida')) > 1:
     run('dd_reintegrate_studyid ' + ofn)
-
-
