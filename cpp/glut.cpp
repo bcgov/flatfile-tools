@@ -1,4 +1,9 @@
 #include"glut.h"
+priority_queue<f_i> dmat;
+map<size_t, size_t> meta;
+// map<size_t, size_t> up;
+map<size_t, size_t> p_count;
+
 GLvoid resize(GLsizei w, GLsizei h){
   GLfloat ratio;
   glViewport(0, 0, w, h);
@@ -22,7 +27,10 @@ GLvoid resize(GLsizei w, GLsizei h){
     _left = -1. * ratio; _right = 1. * ratio;
     _bottom = -1.; _top = 1.;
   }
+
   glMatrixMode(GL_MODELVIEW);
+  //glLoadIdentity();
+  //getMatrix();
 }
 
 GLvoid initializeGL(GLsizei width, GLsizei height){
@@ -64,7 +72,7 @@ void iterate(){
   }
 
   for0(i, sphere_pos.size()){
-
+    // optional scaling
     sphere_pos[i].x -= xmin;
     sphere_pos[i].x *= (1. / (xmax-xmin));
 
@@ -101,43 +109,21 @@ void iterate(){
   }
 }
 
-/* 
-void setOrthographicProjection(){
-  int h = HEIGHT;
-  int w = WIDTH;
-  glMatrixMode(Gl_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2d(0, (float)w, 0., (float)h);
-  glScalef(1., -1., 1.);
-  glTranslatef(0, -1.*(float)h, 0);
-  glMatrixMode(GL_MODELVIEW);
-}
-
-void resetPerspectiveProjection(){
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-}*/
-
-void renderBitmapString(float x, float y, char *string){
-char *c;
-glRasterPos2f(x,y);
-/*
-HDC ghDC;
-HGLRC ghRC;
+void renderBitmapString(float x, float y, const char *string){
+  glRasterPos2f(x,y);
+  /*
+  HDC ghDC;
+  HGLRC ghRC;
   */
   SelectObject(ghDC, GetStockObject(SYSTEM_FONT));
   wglUseFontBitmaps(ghDC, 0, 255, 1000);
-  
   glListBase(1000);
-  glCallLists(24, GL_UNSIGNED_BYTE, "Hello Windows OpenGL!");
+  glCallLists(strlen(string), GL_UNSIGNED_BYTE, string); //"Click on node: show common vs. different, plus. merge (bridge) node info!");
 }
 
 void drawString(){
   renderBitmapString(20, 20, NULL);
 }
-
 
 /* rendering method */
 GLvoid draw(int p_select){
@@ -156,34 +142,62 @@ GLvoid draw(int p_select){
     }
   }
 
+  float screenX, screenY;
   unsigned int ci = 0;
   for(vector<vec3>::iterator it = sphere_pos.begin(); it != sphere_pos.end(); it++){
-    if(myPickNames.size() < 1) sphere_col[ci].color();
+
+    if(ci < csv.size() || ci < (next_label - 33) ){
+      // only draw nodes for merges, not individual data elements
+      ci ++;
+      continue;
+    }
+    if(myPickNames.size() < 1){
+      sphere_col[ci].color();
+    }
     else{
-      if(myPickNames.count(ci) > 0) sphere_col[ci].invert();
-      else sphere_col[ci].color();
+      if(myPickNames.count(ci) > 0){
+        sphere_col[ci].invert();
+        if(ci != last_pick){
+          cout << "pick: " << ci << " p_count " << p_count[ci] << endl;
+        }
+        last_pick = ci;
+      }
+      else{
+        sphere_col[ci].color();
+      }
     }
     glPushMatrix();
-    vec3 tx(sphere_pos[ci] - rX);
+    vec3 tx(sphere_pos[ci] - rX); // ideally this transform would move out of the loop
+    convert_3d_to_2d(tx.x, tx.y, tx.z, screenX, screenY);
+
     tx.translate();
     if(p_select) glPushName(ci);
-    draw_sphere();
+    draw_sphere(5. * SPHERE_RADIUS * ((float)p_count[ci]) / ((float)csv.size()));
     if(p_select) glPopName();
     glPopMatrix();
 
     if(draw_text){
-	setOrthographicProjection();
-	glPushMatrix();
-	glLoadIdentity();
+      setOrthographicProjection();
+      glPushMatrix();
+      glLoadIdentity();
+      glColor3f(.9, 0., 0.);
+      string ds(str("|") + to_string(ci) + str("|=") + to_string(p_count[ci]));
+      renderBitmapString(screenX, -10 -screenY, ds.c_str());
+      //renderBitmapString(screenX - 11, -10 - screenY, (str("i=") + std::to_string(ci)).c_str());
+      // glColor3f(1., 0., 1.);
+      // renderBitmapString(screenX + 31, -10 - screenY, std::to_string(p_count[ci]).c_str());
 
-	drawString();
-	glPopMatrix();
-	resetPerspectiveProjection();
+      glPopMatrix();
+      resetPerspectiveProjection();
     }
 
     ci ++;
+    // vector::iterator it = sphere_pos.begin();
   }
 
+  return; //
+
+  // use a hyperbolic coordinate system instead of fbl
   ci = 0;
   for(vector<vec3>::iterator it = arrow_col.begin(); it != arrow_col.end(); it++){
 
@@ -265,199 +279,6 @@ GLvoid drawScene(int p_select){
   SWAPBUFFERS;
 }
 
-priority_queue<d_idx> s_dmat;
-void read_data(str fn){
-  csv.clear();
-
-  while(s_dmat.size() > 0)s_dmat.pop(); // s_dmat.clear();
-
-  skip_factor = 1000; // 1: don't skip any data
-  // open the input data
-  ifstream g(fn);
-  if(!g.is_open()) err("failed to opend input file");
-  string s;
-
-  // read header
-  getline(g, hdr); // csv.push_back(s);
-
-  if(skip_factor ==1){
-    while(getline(g, s)){
-      csv.push_back(s);
-    }
-  }
-  else{
-    long unsigned int ci = 0;
-    while(getline(g, s)){
-      if(ci % skip_factor == 0){
-        csv.push_back(s);
-      }
-      ci += 1;
-    }
-  }
-  g.close();
-  cout << "fields: " << hdr << endl;
-  cout << "rcords: " << csv.size() << endl; // first record is header
-  // n.b. need to project that onto the data
-}
-
-void cprint(str s){
-  pthread_mutex_lock(&print_mutex);
-  cout << s << endl;
-  pthread_mutex_unlock(&print_mutex);
-}
-
-void * dmat_threadfun(void * arg){
-  vector<str> fields(split(hdr));
-  int n_fields = fields.size();
-
-  float d;
-
-  long unsigned int jobs_by_me = 0;
-  long unsigned int my_next_j;
-  long unsigned int n_records = csv.size();
-  long k = (long)arg;
-  cprint(str("dmat_threadfun(") + std::to_string(k) + str(")"));
-
-  while(1){
-    // try to pick up another job
-    pthread_mutex_lock(&next_j_mutex);
-    my_next_j = next_j ++; // index of data this thread should pick up if it can
-    pthread_mutex_unlock(&next_j_mutex);
-
-    if(my_next_j > n_records - 1){
-      cprint(str("\texit thread ") + to_string(k) + str(" njob ") + to_string(jobs_by_me));
-      return NULL;
-    }
-    else{
-      jobs_by_me += 1;
-    }
-
-    cprint(str("  worker: ") + to_string(k) + str(" pickup: ") + to_string(my_next_j));
-
-    // calculate a row of the distance matrix
-
-    unsigned int i, m;
-    unsigned int k;
-    //vector<float> tmp;
-
-    str u,v;
-    str us("unknown");
-
-    for0(i, n_records){
-      // distance function
-      d = 0.;
-      for0(m, n_fields){
-        u = data[my_next_j * n_fields + m];
-        v = data[i * n_fields + m];
-
-        // can't get similarity from unknown
-        if (u == v && u != us && v != us){
-        }
-        else{
-          d += 1.;
-        }
-      }
-      dmat[my_next_j * n_records + i] = d;
-      //tmp.push_back(
-      //cprint(str("\n\n") + to_string(d) + str("\n") + csv[i] + str("\n") + csv[my_next_j]);
-
-    }
-    pthread_mutex_lock(&print_mutex);
-    //cout << "w" << k << " j" << my_next_j << " " << hdr << " " << tmp << endl;
-    pthread_mutex_unlock(&print_mutex);
-  }
-}
-
-void sort_dmat(){
-  long unsigned int n_records = csv.size();
-
-  // make sure the queue is clear
-  while(s_dmat.size() > 0) s_dmat.pop();
-
-  cout << "\n\nsorting.." << endl;
-  unsigned long int i, j, k;
-  for0(i, n_records){
-    for0(j, i){
-      k = j * n_records + i;
-      //cout << "push " << dmat[k] << " " << k << " j " << j << " i " << i << endl;
-      s_dmat.push(d_idx(dmat[k], k));
-    }
-  }
-  cout << "done sorting" << endl;
-  // next step: hierarchical clustering
-}
-
-void calc_dmat(){
-  cout << "calc_dmat.." << endl;
-
-  // if(data != NULL) delete(data);
-
-  long unsigned int j, i;
-  long unsigned int n_records = csv.size();
-  cout << "n_records " << n_records << endl;
-  vector<str> fields(split(hdr));
-  int n_fields = fields.size();
-  cout << "n_fields " <<n_fields << endl;
-  long unsigned int n_strings = n_records * n_fields;
-
-  cout << "allocate memory for split strings.." << endl;
-  data = new string[n_strings];
-  for0(j, n_strings) data[j] = str("");
-
-  cout << "splitting csv.." << endl;
-  vector<str> words;
-  for0(j, n_records){
-    words = split(csv[j]);
-    if(words.size() != n_fields) err("unexpected number of fields");
-    for0(i, n_fields){
-      trim(words[i]);
-      lower(words[i]);
-      data[(j*n_fields) + i] = words[i];
-      // cout << i << " " << data[(j*n_fields) + i] << " " << words << endl;
-    }
-  }
-
-  cprint(str("csv splitting complete.."));
-
-  long unsigned int dmat_size = csv.size() * csv.size();
-  dmat = (float *) (void *) balloc(sizeof(float) * dmat_size);
-  for0(j, dmat_size) dmat[j] = 0.;
-
-  next_j = 0; // put a lock on this variable
-
-  int numCPU;
-  #ifdef WIN32
-  SYSTEM_INFO sysinfo;
-  GetSystemInfo(&sysinfo);
-  numCPU = sysinfo.dwNumberOfProcessors;
-  #else
-  numCPU = sysconf(_SC_NPROCESSORS_ONLN);
-  #endif
-  cout << "Number of cores: " << numCPU << endl;
-
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  // set up mutexes
-  pthread_mutex_init(&print_mutex, NULL);
-  pthread_mutex_init(&next_j_mutex, NULL);
-
-  // allocate threads
-  pthread_t * my_pthread = new pthread_t[numCPU];
-  for0(j, numCPU){
-    long k = j;
-    pthread_create(&my_pthread[j], &attr, dmat_threadfun, (void *) k);
-  }
-
-  // wait for threads to finish
-  for0(j, numCPU){
-    pthread_join(my_pthread[j], NULL);
-  }
-  //pthread_mutex_destroy(&next_j_mutex);
-  //pthread_exit(NULL);
-  //delete my_pthread;
-  cout << "end dmat_calc()" << endl;
-}
-
 void hclust(){
   sphere_pos.clear();
   sphere_col.clear();
@@ -468,78 +289,91 @@ void hclust(){
   float R_FACT = 0.; //125.;
   float z = R_FACT * (float)rand() / (float) RAND_MAX;
 
-  vec3 pink(0, 1, 0); //vec3 pink(1., .00, .00);
+  vec3 pink(0, 1, 0);
   vec3 antipink(1. - pink.x, 1. - pink.y, 1. - pink.z);
-  //vec3 antipink(0, 1, 0);
   vec3 line_colour(0., 0., 1.);
 
   vec3 leaf_colour(antipink);
   vec3 node_colour(pink);
 
   int debug = false;
-  unsigned long int i, j;
-  unsigned long int n_records = csv.size();
+  size_t i, j;
+  size_t n_records = csv.size();
 
-  unsigned long int my_label;
-  unsigned long int next_label = n_records; // progressively inclusive labels will start on new numerological turf
+  size_t my_label;
+  next_label = n_records; // progressively inclusive labels will start on new numerological turf
   if(debug) cout << "==============================" << endl;
 
   if(debug) cout << "next_label " << next_label << " final label should be <= (n^2 - n) / 2 = " << (n_records * n_records - n_records ) / 2 << endl;
-  map<unsigned long int, unsigned long int> meta;
-  map<unsigned long int, unsigned long int> up;
-
-  map<unsigned long int, unsigned long int> count;
-
+  /*
+  map<size_t, size_t> meta;
+  map<size_t, size_t> up;
+  map<size_t, size_t> count;
+  */
   // idea: iterative incarnations of recursive or hierarchical things-- conceptual unification of iteration and hierarchy
   // dictionary (non-pointer) implementation of disjoint-set forest
 
   // seed the "simulation" (bad terminology)
   for0(i, n_records){
-    meta[i] = up[i] = i;
-    sphere_pos.push_back(vec3(0, (float)i, z)); sphere_col.push_back(leaf_colour);//vec3(1., .1, .5));
+    meta[i] = i;//up[i] = i;
+    sphere_pos.push_back(vec3(0, (float)i, z)); sphere_col.push_back(leaf_colour);
     z =R_FACT* (float)rand() / (float)RAND_MAX;
-    count[i] = 1;
+    p_count[i] = 1;
   }
 
   // n.b. in "top" all keys will eventually all map to the same value,
   // whereas label maps to the next most inclusive node (value) AKA set (up arrow)
 
-  long unsigned int iter = 1;
-  stack<d_idx> tmp;
-  while(s_dmat.size() > 0){
-    cout << iter << "------------------------------" << endl;
-    float x = s_dmat.top().d;
+  size_t iter = 1;
+  stack<f_i> tmp;
+  while(dmat.size() > 0){
+    bool new_label_this_iter = false;
 
-    map<unsigned long int, unsigned long int> meta_p;
+    float x = dmat.top().f;
+
+    map<size_t, size_t> meta_p;
     meta_p.clear();
 
     if(debug) cout << "meta: " << meta << endl;
-    while(s_dmat.size() > 0 && s_dmat.top().d == x){
-      d_idx a(s_dmat.top());
-      i = a.idx % n_records;
-      j = a.idx / n_records;
-      if(debug) cout << "pull " << s_dmat.top().d << " " << j << "," << i << " mj, mi=" << meta[j] << "," << meta[i] << endl; //<< s_dmat.top().idx << endl;
-      s_dmat.pop();
+    while(dmat.size() > 0 && dmat.top().f == x){
+      f_i a(dmat.top());
 
-      unsigned long int topi = meta[i];
+      size_t a_i = a.i;
+
+      i = a_i / n_records;
+      j = a_i % n_records;
+
+      // might need to put this back in
+      // cout << "*fij(" << a.f << "," << i << "," << j << ")" << endl;
+      if(debug) cout << "pull " << dmat.top().f << " " << j << "," << i << " mj, mi=" << meta[j] << "," << meta[i] << endl;
+      dmat.pop();
+
+      // path flattening
+      size_t topi = meta[i];
       while(topi != meta[topi]){
         if(debug) cout << "\tflatten: " << topi << "," << meta[topi] << " --> " << meta[topi] << endl;
         topi = meta[topi];
       }
-      unsigned long int topj = meta[j];
+      size_t topj = meta[j];
       while(topj != meta[topj]){
         if(debug) cout << "\tflatten: " << topj << "," << meta[topj] << " --> " << meta[topj] << endl;
         topj = meta[topj];
       }
 
+      if(topi == topj) continue;
+
       if(meta_p.count(topi) < 1 && meta_p.count(topj) < 1){
         my_label = next_label ++;
-        /* meta_p[i] = meta_p[j] = */ meta_p[topi] = meta_p[topj] = my_label;
-        if(debug) cout << "\tnew_label " << topi << ", " << topj << " --> " << my_label << endl;
+        /* meta_p[i] = meta_p[j] = */
+        meta_p[topi] = meta_p[topj] = my_label;
+        cout << "\tnew_label " << topi << ", " << topj << " --> " << my_label << " d=" << a.f << endl;
         meta_p[my_label] = my_label;
         sphere_pos.push_back(vec3((float)iter, (float)i, z)); sphere_col.push_back(node_colour); //vec3(0., 1.0, .0));
         z = R_FACT * (float)rand() / (float)RAND_MAX;
-	count[my_label] = count[topi] + count[topj];
+
+        //p_count[my_label] = p_count[topi] + p_count[topj];
+
+        new_label_this_iter = true;
       }
       else if(meta_p.count(topi) < 1){
         meta_p[topi] = meta_p[topj]; cout << "\t" << topi << " --> " << meta_p[topj] << endl;
@@ -559,16 +393,89 @@ void hclust(){
 
     }
     if(debug) cout << "relabel: " << endl;
-    for(map<unsigned long int, unsigned long int>::iterator it = meta_p.begin(); it != meta_p.end(); it ++){
+    for(map<size_t, size_t>::iterator it = meta_p.begin(); it != meta_p.end(); it ++){
       meta[it->first] = it->second;
-      cout << it->first << " --> " << it->second << endl;
+      // cout << "\t" << it->first << " --> " << it->second << endl;
+
       if(it->first != it->second){
-        arrow_head.push_back(it->first); arrow_tail.push_back(it->second); arrow_col.push_back(line_colour); //vec3(.0, .0, 1.));
+        p_count[it->second] += p_count[it->first];
+        cout << "\t*" << it->first << " --> " << it->second << endl;
+        arrow_head.push_back(it->first);
+        arrow_tail.push_back(it->second);
+        arrow_col.push_back(line_colour);
       }
     }
 
     if(debug) cout <<"*eta: " << meta << endl;
     iter += 1;
+
+    if(new_label_this_iter) cout << endl /*<< iter*/ << "------------------------------" << endl;
+  }
+}
+
+void read_data(str fn){
+  size_t ci = 0; // row count
+
+  // open the input data
+  ifstream g(fn);
+  if(!g.is_open()) err("failed to opend input file");
+  string s;
+
+  // read header
+  getline(g, hdr);
+  while(getline(g, s)){
+    csv.push_back(s);
+    ci ++;
+  }
+  g.close();
+  cout << "fields: " << split(hdr) << endl;
+  cout << "rcords: " << csv.size() << endl; // first record is header
+  // n.b. need to project that onto the data
+}
+
+float * dmat_d;
+size_t * dmat_i;
+
+void read_dmat(){
+  // allocate memory
+  size_t n_records = csv.size();
+  size_t k_max = fsize("dmat.d") / (sizeof(float) * n_records);
+  cout << "kmax " << k_max << endl;
+
+  if(dmat_d == NULL){
+    dmat_d = (float *) alloc(n_records * k_max * sizeof(float));
+  }
+  if(dmat_i == NULL){
+    dmat_i = (size_t *) alloc(n_records * k_max * sizeof(size_t));
+  }
+
+  if(true){
+    // read truncated sorted distance-matrix
+    FILE * f;
+    f = fopen("dmat.d", "rb");
+    cout << " read " << n_records * k_max * sizeof(float) << endl;
+    size_t fr = fread(dmat_d, n_records * k_max * sizeof(float), 1, f);
+    if(fr != 1) err("read fail 1");
+    fclose(f);
+
+    f = fopen("dmat.i", "rb");
+    cout << " read " << n_records * k_max * sizeof(size_t) << endl;
+    fr = fread(dmat_i, n_records * k_max * sizeof(size_t), 1, f);
+    if(fr != 1) err("read fail 2");
+    fclose(f);
+  }
+
+  size_t u, i, j, k;
+
+  for(u = 0; u < (n_records * k_max); u++){
+    float f = dmat_d[u];
+    i = u / k_max;
+    j = dmat_i[u];
+    size_t ki = i * n_records + j;
+    f_i a(f, ki);
+    // might need to put this one back in:
+    // printf("f %f i %ld j %ld ki %ld u %ld\n", f, (long int)i, (long int)j, (long int)ki, (long int)u);
+    dmat.push(a);
   }
 }
 
@@ -580,17 +487,17 @@ void cluster(){
   cout << "read data.." << endl;
   read_data(fn); // read the data
 
-  cout << "calc dmat.." << endl;
-  calc_dmat(); // calculate the distance matrix
-
-  cout << "sort dmat.." << endl;
-  sort_dmat(); // sort the distance matrix
+  read_dmat();
 
   cout << "hclust.." << endl;
-  hclust(); // hierarchical clustering on the distance matrix
+  hclust(); // hierarchical clustering upon: truncated sorted distance matrix
+
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+  dmat_d = (float *) NULL;
+  dmat_i = (size_t *) NULL;
+
   data = NULL;
   cur_data_file = 0; // start with the first file
   str fn("");
@@ -613,14 +520,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   myZFar = 10.;
   myZNear = -10.;
   SHIFT_KEY = false;
+  last_pick = -1;
   _mouseLeft = _mouseRight = false;
   _dragPosX = _dragPosY = _dragPosZ = 0.0;
   myLeft = myRight = myBottom = myTop = 0.;
   for(int i = 0; i < 4; i++) zprReferencePoint[i] = 0.;
   _mouseX = _mouseY = _mouseLeft = _mouseMiddle = _mouseRight = 0;
 
-  set_width(1111);
-  set_height(1111);
+  set_width(1440);
+  set_height(1440);
   zprReferencePoint[0] = zprReferencePoint[1] = zprReferencePoint[2] = zprReferencePoint[3] = 0.;
   getMatrix();
 
@@ -644,22 +552,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
   ShowWindow (ghWnd, nCmdShow); // show and update main window
   UpdateWindow (ghWnd);
 
-  /*
-GLfloat lightpos[] = {.5, 1., 1., 0.};
-glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-glEnable(GL_LIGHTING);
-glEnable(GL_LIGHT0);
-*/
-
-/* animation loop */
-while(1){
-  while(PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) == TRUE){
-    if(GetMessage(&msg, NULL, 0, 0)){
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
+  /* animation loop */
+  while(1){
+    while(PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) == TRUE){
+      if(GetMessage(&msg, NULL, 0, 0)){
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+      }
+      else return TRUE;
     }
-    else return TRUE;
+    drawScene(false);
   }
-  drawScene(false);
-}
 }
