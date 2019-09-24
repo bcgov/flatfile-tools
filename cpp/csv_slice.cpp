@@ -81,13 +81,13 @@ int main(int argc, char ** argv){
       outfile << "\n";
 
       if(w.size() != n_f){
-	      w = split_special(line);
-	if(w.size() != n_f){
-        	cout << "w.size()" << w.size() << endl;
-        	cout << "n_f " << n_f << endl;
-        	cout << w << endl;
-        	// cout << "WARNING: " << (string("unexpected number of fields")) << end;
-	}
+        w = split_special(line);
+        if(w.size() != n_f){
+          cout << "w.size()" << w.size() << endl;
+          cout << "n_f " << n_f << endl;
+          cout << w << endl;
+          // cout << "WARNING: " << (string("unexpected number of fields")) << end;
+        }
       }
       for(it = selected.begin(); it != selected.end(); it++){
         if(it!= selected.begin()){
