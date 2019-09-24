@@ -22,5 +22,3 @@ c = [c[i].strip() for i in range(0, len(c))]
 for cc in c:
     run("dent " + cc)
     run("ws " + cc)
-
-
