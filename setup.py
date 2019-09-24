@@ -5,9 +5,16 @@ from py.misc import *
 from py.ansicolor import *
 
 job_file = open("compile_jobs.sh", "wb")
+clean_file = open("clean_jobs.sh", "wb")
 
 def add_job(cmd):
     job_file.write((cmd + "\n").encode())
+
+def add_clean_job(cmd):
+    clean_file.write((cmd + "\n").encode())
+
+# need to be able to detect python, R, and vim (if exist)
+# need to do the wrapping (as we did for py) for R programs, too!
 
 sys_s, sys_n = os.popen("uname -a").read().strip().lower(), None
 if sys_s[0:6] == 'cygwin': sys_n = 'cygwin'
@@ -36,38 +43,36 @@ compiled = {}
 line_count = 0
 
 def compile(f):
-    global line_count
-    try:
-        line_count += int(os.popen("lc " + f.strip()).read().strip())
-    except:
-        pass
-    # print(KRED + f.strip('./') + KGRN)
+    print("compile " + f)
+    f = f.strip()
     global build, compiled
     ext = f.strip().split('.')[-1].strip()
     fn = f.split('/')[-1].strip().split('.')[0]
     # print("fn", fn)
-    if ext == 'py' and build is not None and build != fn:
-        return
+    if ext == 'py' and build is not None and build != fn: return
 
     # don't compile helper funcs as a binary; no main()
-    if fn == "misc" or fn == "__init__" or fn == "wrap_py":
-        return
+    if fn == "misc" or fn == "__init__" or fn == "wrap_py": return
 
     if not fn in compiled:
         compiled[fn] = True
     else:
         return
 
-    cmds = ""
+    clean_cmds = ('ws ' + f)
+    cmds = ''
+
     if ext == 'c' or ext == 'cpp':
+        clean_cmds += ("; dent " + f)
         cmd = 'g++ -w -O4 -march=native -flto -o ' + fn + '.exe ' + f
         if ext == 'cpp': cmd += ' cpp/misc.cpp'
         cmd += ' -lopengl32 -lglu32 -lgdi32'
         if (not build) or (fn == build):
             print('\t' + cmd)
-            cmds += cmd # add_job(cmd) # a = os.system(cmd) # note: didn't use run because compiling might brea
-
-    if ext == 'py':
+            cmds += " " + cmd # add_job(cmd) # a = os.system(cmd) # note: didn't use run because compiling might brea
+    elif ext =='h':
+        clean_cmds += ("; dent " + f) 
+    elif ext == 'py':
         wrap_file = 'wrap-py_' + fn + '.cpp'
         # for py files, write a cpp wrapper so we can call from bin folder
         cf = open(wrap_file, 'wb') #'wrap_py.cpp', 'wb')
@@ -76,6 +81,7 @@ def compile(f):
                  '#include<string>',
                  'using namespace std;',
                  'int main(int argc, char ** argv){',
+                 #'  string cmd("/cygdrive/c/Program\\\\ Files/Python35/python.exe ");',
                  '  string cmd("/cygdrive/c/Python27/python.exe ");',
                  '  cmd += string("R:/' + os.popen("whoami").read().strip() + '/bin/py/' + fn + '.py");',
                  '  for(int i=1; i<argc; i++){',
@@ -89,44 +95,73 @@ def compile(f):
         cf.close()
         cmd = 'g++ -w -O3 -o ' + fn + '.exe ' + ' ' + wrap_file #wrap_py.cpp '
         print('\t' + cmd)
-        cmds += cmd # a = os.system(cmd)
-        cmd =  ("rm -f " + wrap_file) #wrap_py.cpp")
-        cmds += "; " + cmd; # a = os.system(cmd)
-        #if os.path.exists(fn + ".exe"):
-        if(False):
-            cmd = "icacls " + fn + ".exe /grant everyone:F"
-            cmds += "; " + cmd # a = os.popen(cmd).read()
+        cmds += " " + cmd # a = os.system(cmd)
+        if(True):
+            cmd =  ("rm -f " + wrap_file) #wrap_py.cpp")
+            cmds += "; " + cmd;
+    elif ext == 'R':
+        wrap_file = 'wrap-r_' + fn + '.cpp'
+        # for py files, write a cpp wrapper so we can call from bin folder
+        cf = open(wrap_file, 'wb')
+        lines = ['#include<stdlib.h>',
+                 '#include<iostream>',
+                 '#include<string>',
+                 'using namespace std;',
+                 'int main(int argc, char ** argv){',
+                 '  string cmd("rscript ");',
+                 '  cmd += string("R:/' + os.popen("whoami").read().strip() + '/bin/R/' + fn + '.R");',
+                 '  for(int i=1; i<argc; i++){',
+                 '    cmd += string(" ") + string(argv[i]);',
+                 '  }',
+                 'std::cout << cmd << endl;',
+                 'system(cmd.c_str());',
+                 'return(0);',
+                 '}']
+        cf.write('\n'.join(lines).encode())
+        cf.close()
+        cmd = 'g++ -w -O3 -o ' + fn + '.exe ' + ' ' + wrap_file #wrap_py.cpp '
+        print('\t' + cmd)
+        cmds += " " + cmd # a = os.system(cmd)
+        if(True):
+            cmd =  ("rm -f " + wrap_file) #wrap_py.cpp")
+            cmds += "; " + cmd;
+
 
     add_job(cmds)
+    add_clean_job(clean_cmds)
 
 if not build:
     # find source files and compile
     cpp = os.popen('find ./cpp/ -name "*.cpp"').read().strip().split('\n')
     py = os.popen('find ./py/ -name "*.py"').read().strip().split('\n')
     c = os.popen('find ./c/ -name "*.c"').read().strip().split('\n')
-    n = len(cpp) + len(py) + len(c)
+    R = os.popen('find ./c/ -name "*.R"').read().strip().split('\n')
+    n = len(cpp) + len(py) + len(c) + len(R)
 
-    for f in py:
-        compile(f)
-    for f in c:
-        compile(f)
-    for f in cpp:
-        compile(f)
+    for f in R: compile(f)
+    for f in py: compile(f)
+    for f in c: compile(f)
+    for f in cpp: compile(f)
 else:
     print("build", build)
     c_file = 'c/' + build + '.c'
     cpp_file = 'cpp/' + build + '.cpp'
     py_file = 'py/' + build + '.py'
+    r_file = 'R/' + build + '.R'
     if exists(cpp_file):
         compile(cpp_file)
     elif exists(c_file):
         compile(c_file)
     elif exists(py_file):
         compile(py_file)
+    elif exists(r_file):
+        compile(r_file)
     else:
-        err("failed to find file for: " + build)
+        err("failed to find file for: " + build +
+            ". N.b., py goes in py folder, " +
+            "cpp goes in cpp folder, etc.")
 
 
 job_file.close()
-print("line_count " + str(line_count))
+clean_file.close()
 
