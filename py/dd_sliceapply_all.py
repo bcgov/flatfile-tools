@@ -8,21 +8,21 @@ msg = ("dd_sliceapply_all.py: extract all fields from a .dat file, choosing the 
        "usage:\n\tdd_sliceapply_all [dat file name] [cohort file (1-col csv with label studyid)]")
 '''
 if len(sys.argv) < 2:
-    err("dd_sliceapply_all.py: extract all fields from a .dat file, choosing the data dictionary automatically.\n" + 
-        "usage:\n\tdd_sliceapply_all [dat file name]\nNote: dd/ directory expected in present working folder" + 
+    err("dd_sliceapply_all.py: extract all fields from a .dat file, choosing the data dictionary automatically.\n" +
+        "usage:\n\tdd_sliceapply_all [dat file name]\nNote: dd/ directory expected in present working folder" +
         "usage:\n\tdd_sliceapply_all [dat file name] [cohort file (1-col csv with label studyid)]")
 '''
 
 if len(args) >= 2:
     fn = sys.argv[1]
     ddn = fn + ".dd"
-    
+
     if not os.path.exists(fn) or not os.path.isfile(fn):
         err("couldn't find input file: " + fn.strip())
-    
+
     if not os.path.exists(ddn):
         run("dd_match_data_file " + fn)
-    
+
     if not os.path.exists(ddn):
         err("data dictionary match not found")
 
@@ -62,4 +62,3 @@ else:
     raw_input("run the above jobs? press RETURN or ctrl-c to abort")
 
     run("multicore ./.dd_sliceapply_jobs.txt 4")
-
