@@ -165,7 +165,6 @@ int main(int argc, char ** argv){
   if(label_lookup.count(str("studyid2")) > 0) studyid_i.insert(label_lookup[str("studyid2")]);
   if(label_lookup.count(str("studyid3")) > 0) studyid_i.insert(label_lookup[str("studyid3")]);
   if(studyid_i.size() == 0) err("studyid label not found for data file");
-  
 
   cout << "studyid_i " << studyid_i << endl;
 
