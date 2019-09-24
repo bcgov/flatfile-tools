@@ -1,4 +1,4 @@
-# 2019/01/08 arichardson: flip (reorder) columns in csv with header
+# 2019/01/08 flip (reorder) columns in csv with header
 # nested commas tolerated!
 import os
 import sys
