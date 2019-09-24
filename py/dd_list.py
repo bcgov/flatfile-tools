@@ -103,4 +103,3 @@ for fn in nflt:
     new_fn = "dd/" + date_str + "_" + fn.split('/')[-1]
     run("cp " + fn + " " + new_fn)
     run("dd_convert_nflt_to_csv2 " + new_fn)
-
