@@ -1,9 +1,10 @@
 echo "starting bash_profile.."
-# make a folder in the appropriate temporary location (ensure it's deleted before logff)
+
+# make a temp folder (ensure delete before logoff)
 cd /cygdrive/c/Users/$USER/AppData/
 mkdir -p tmp
 
-# navigate to the bin folder
+# navigate to bin folder
 cd /cygdrive/r/$USER/bin/
 
 # set up paths for required tools
@@ -14,8 +15,11 @@ if ! test -f "$R_FILE"; then
 else
   alias Rscript="/cygdrive/c/Program\ Files/R/R-3.5.2/bin/Rscript.exe"
 fi
- 
+
+# aliases
 alias python="/cygdrive/c/Program\ Files/Python35/python/" #alias python="/cygdrive/c/Python27/python.exe"
+alias bin="cd /cygdrive/r/$USER/bin/"
+alias tmp="cd /cygdrive/c/Users/$USER/AppData/tmp/"
 export PATH="$PATH:/cygdrive/r/$USER/bin"
 
 # test if programs built
@@ -27,5 +31,5 @@ else
   echo "command line utils already set up.."
 fi
 
-# go to the temp folder (make sure to clean it up after)
+# goto temp folder
 cd /cygdrive/c/Users/$USER/AppData/tmp/
