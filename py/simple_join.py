@@ -27,7 +27,7 @@ for i in range(0, len(fields2)):
     fields2[i] = "2"+fields2[i]
     if fields2[i] == 'studyid':
         s_f_i = i
-    
+
 
 of.write(",".join(fields1)); of.write(",")
 of.write(",".join(fields2)); of.write("\n"); ci = 0
