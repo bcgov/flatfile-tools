@@ -222,3 +222,15 @@ void rewind(ifstream &a){
   a.clear();
   a.seekg(0);
 }
+
+// priority_queue max-first, we want min
+bool operator < (const f_i &a, const f_i &b){
+  return a.f > b.f;
+}
+
+/*
+bool operator < (const f_ij &a, const f_ij &b){
+  return a.f > b.f;
+}
+*/
+
