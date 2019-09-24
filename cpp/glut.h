@@ -15,43 +15,20 @@ test opengl graphics without any extra drivers or libraries */
 #include<pthread.h>
 using namespace std;
 
+// clustering stuff
+void cluster();
 int cur_data_file;
 vector<str> data_files;
-void cluster();
+size_t next_label;
 
-
-class d_idx{
-  // distance + index tuple object
-  public:
-  float d;
-  long unsigned int idx;
-  d_idx(float _d, long unsigned int _idx){
-    d = _d;
-    idx = _idx;
-  }
-  d_idx(const d_idx &a){
-    d = a.d;
-    idx = a.idx;
-  }
-};
-
-bool operator<(const d_idx& a, const d_idx&b){
-  return a.d > b.d; // priority_queue is max first
-}
+// visualization stuff
+int last_pick;
+vector<str> captions; // sphere labels
 
 // stuff for distance-matrix calculation
 str hdr; // csv fields
 vector<str> csv; // comma-separated input data
 str * data;
-
-
-int skip_factor;
-long unsigned int next_j;
-pthread_attr_t attr; // specify threads joinable
-pthread_mutex_t print_mutex;
-pthread_mutex_t next_j_mutex;
-float * dmat;
-
 
 /* Windows globals, defines, and prototypes */
 HDC ghDC;
@@ -61,7 +38,6 @@ CHAR window_name[]="glut";
 
 #define SWAPBUFFERS SwapBuffers(ghDC)
 #define MAXBUFFERSIZE 1024
-
 
 #define SPHERE_RADIUS 0.015 // this needs to be dynamic with the size of the stuff
 #define ARROWHEAD_LENGTH (0.25 * SPHERE_RADIUS)
@@ -126,7 +102,7 @@ class vec3{
     return *ret;
   }
   vec3 &operator +=(vec3 rhs){
-    x += rhs.x; 
+    x += rhs.x;
     y += rhs.y;
     z += rhs.z;
   }
@@ -156,12 +132,11 @@ class vec3{
   }
 };
 
-vec3 rX;
-void draw_sphere(){
+vec3 rX; // relative position variable: 3d reference point for shifting perspetive
+void draw_sphere(GLfloat _radius){
   const float GL_PI = 3.141592;
   GLfloat alpha, beta, x, y, z; // Storage for coordinates and angles
-  GLfloat _radius = SPHERE_RADIUS;
-  int gradation = 7;
+    int gradation = 3;
 
   for (alpha = 0.0; alpha < GL_PI; alpha += GL_PI/gradation){
     glBegin(GL_TRIANGLE_STRIP);
@@ -181,13 +156,15 @@ void draw_sphere(){
   }
 }
 
-std::set<GLint> myPickNames;
+// variables for clustering vis ------------------------------
 vector<vec3> sphere_pos;
 vector<vec3> sphere_col;
+std::set<GLint> myPickNames;
 
 vector<unsigned int> arrow_head;
 vector<unsigned int> arrow_tail;
 vector<vec3> arrow_col;
+// -----------------------------------------------------------
 
 int SHIFT_KEY;
 int CONTROL_KEY;
@@ -271,7 +248,7 @@ void setOrthographicProjection() {
   glLoadIdentity();
   gluOrtho2D(0., (float)w, 0., (float)h);
   glScalef(1., -1., 1.);
-  glTranslatef(0, -1.*(float)h, 0);
+  glTranslatef(0., -1. * (float)h, 0.);
   glMatrixMode(GL_MODELVIEW);
 }
 
@@ -281,22 +258,22 @@ void resetPerspectiveProjection(){
   glMatrixMode(GL_MODELVIEW);
 }
 
-void pos(double *px,double *py,double *pz,const int x,const int y,const int *viewport){
+void pos(double *px, double *py, double *pz, const int x, const int y, const int *viewport){
   /*
   * Use the ortho projection and viewport information
   * to map from mouse co-ordinates back into world
   * co-ordinates
   * */
-  *px = (double)(x-viewport[0])/(double)(viewport[2]);
-  *py = (double)(y-viewport[1])/(double)(viewport[3]);
+  *px = (double)(x - viewport[0]) / (double)(viewport[2]);
+  *py = (double)(y - viewport[1]) / (double)(viewport[3]);
 
-  *px = _left + (*px)*(_right-_left);
-  *py = _top + (*py)*(_bottom-_top);
+  *px = _left + (*px) * (_right-_left);
+  *py = _top + (*py) * (_bottom-_top);
   *pz = _zNear;
 }
 
 double vlen(double x,double y,double z){
-  return sqrt(x*x+y*y+z*z);
+  return sqrt(x * x + y * y + z * z);
 }
 
 GLvoid draw(int p_select);
@@ -305,17 +282,18 @@ void zprMotion(GLint x, GLint y){
   bool changed = false;
   int dx = x - _mouseX;
   int dy = y - _mouseY;
-  if(dx == 0 and dy == 0) return;
+  if(dx == 0 and dy == 0){
+    return;
+  }
 
   GLint viewport[4];
   glGetIntegerv(GL_VIEWPORT,viewport);
   double px,py,pz;
-  pos(&px,&py,&pz,x,y,viewport);
+  pos(&px, &py, &pz, x, y, viewport);
 
   if(CONTROL_KEY && _mouseLeft){
     if(myPickNames.size() == 1){
-      set<GLint>::iterator it = myPickNames.begin(); // glPlottable * a = (* (myGraphicsAsAFunctionOfGLName.find( *it ))).second;
-
+      set<GLint>::iterator it = myPickNames.begin();
       vec3 * a = &sphere_pos[*it]; // sphere centre coord, for name *it
       GLdouble proj[16]; // vars
       GLdouble model[16];
@@ -335,9 +313,9 @@ void zprMotion(GLint x, GLint y){
       mz = (double) a->z;
 
       //world xyz onto screen xyz
-      gluProject(mx,my,mz,model,proj,view,&vx,&vy,&vz);
+      gluProject(mx, my, mz, model, proj, view, &vx, &vy, &vz);
 
-      float screeny = vy - screendy; // - (float)screeny;
+      float screeny = vy - screendy;
       float screenx = vx + screendx;
 
       //screen xyz onto world xyz
@@ -348,7 +326,8 @@ void zprMotion(GLint x, GLint y){
       a->y = translation.y;
       a->z = translation.z;
 
-      draw(false); //SWAPBUFFERS; a->Update = true; glutPostRedisplay(); display(); glutSwapBuffers();
+      draw(false);
+      //SWAPBUFFERS; a->Update = true; glutPostRedisplay(); display(); glutSwapBuffers();
       _dragPosX = px;
       _dragPosY = py;
       _dragPosZ = pz;
@@ -360,7 +339,7 @@ void zprMotion(GLint x, GLint y){
   else{
     if(myPickNames.size() < 1){
       if(_mouseLeft && _mouseRight){
-	// zoom
+        // zoom
         double s = exp((double)dy*0.01);
         glTranslatef( zprReferencePoint[0], zprReferencePoint[1], zprReferencePoint[2]);
         glScalef(s,s,s);
@@ -368,23 +347,21 @@ void zprMotion(GLint x, GLint y){
         changed = true;
       }
       else if(_mouseRight){
-	// pan
-	if(true){
-          //double px,py,pz;
+        // pan
+        if(true){
           glMatrixMode(GL_MODELVIEW);
-          //pos(&px,&py,&pz,x,y,viewport);
           glLoadIdentity();
           glTranslatef(px-_dragPosX,py-_dragPosY,pz-_dragPosZ);
           glMultMatrixd(_matrix);
           _dragPosX = px;
-	  _dragPosY = py;
-	  _dragPosZ = pz;
+          _dragPosY = py;
+          _dragPosZ = pz;
           changed = true;
-	}
+        }
       }
       else if(_mouseLeft){
-	// rotate
-        double ax,ay,az,bx,by,bz,angle;
+        // rotate
+        double ax, ay, az, bx, by, bz, angle;
         ax = dy;
         ay = dx;
         az = 0.0;
@@ -403,7 +380,8 @@ void zprMotion(GLint x, GLint y){
     }
   }
   if(changed){
-    getMatrix(); //SWAPBUFFERS; ////glutPostRedisplay();
+    getMatrix();
+    //SWAPBUFFERS; glutPostRedisplay();
   }
 }
 
@@ -412,7 +390,7 @@ void getMatrix(){
   invertMatrix(_matrix,_matrixInverse);
 }
 
-void invertMatrix(const GLdouble *m, GLdouble *out ){
+void invertMatrix(const GLdouble *m, GLdouble *out){
   #define MAT(m,r,c) (m)[(c)*4+(r)]
   #define m11 MAT(m,0,0)
   #define m12 MAT(m,0,1)
@@ -533,10 +511,14 @@ LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     break;
 
     case WM_SIZE:
-    GetClientRect(hWnd, &rect);
-    resize(rect.right, rect.bottom);
-    WIDTH = rect.right;
-    HEIGHT =rect.bottom;
+    if(true){
+      GetClientRect(hWnd, &rect);
+      resize(rect.right, rect.bottom);
+      WIDTH = rect.right;
+      HEIGHT =rect.bottom;
+
+      cout << " WIDTH " << WIDTH << " HEIGHT " << HEIGHT << endl;
+    }
     break;
 
     case WM_CLOSE:
@@ -553,36 +535,31 @@ LONG WINAPI MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     PostQuitMessage(0);
     break;
 
-    /* 
-     int cur_data_file;
-vector<str> data_files;
-     * */
-
     case WM_KEYDOWN:{
       switch (wParam) {
         case VK_SHIFT: SHIFT_KEY = true; break;
         case VK_CONTROL: CONTROL_KEY = true; break;
         case VK_LEFT:
-			 if(cur_data_file > 0){
-				 cur_data_file -= 1;
-				 cout << "cur_data_file --" << endl;
-				 cluster();
-			 }
-			 else{
-				 cout << "cur_data_file " << cur_data_file << endl;
-			 }
-			 break;
+        if(cur_data_file > 0){
+          cur_data_file -= 1;
+          cout << "cur_data_file --" << endl;
+          cluster();
+        }
+        else{
+          cout << "cur_data_file " << cur_data_file << endl;
+        }
+        break;
         case VK_RIGHT:
-			 if(cur_data_file < data_files.size() -1){
-			   cur_data_file += 1;
-			   cout << "cur_data_file ++" << endl;
-			   cluster();
-			 }
-			 else{
-				 cout << "cur_data_file " << cur_data_file << endl;
-			 }
+        if(cur_data_file < data_files.size() - 1){
+          cur_data_file += 1;
+          cout << "cur_data_file ++" << endl;
+          cluster();
+        }
+        else{
+          cout << "cur_data_file " << cur_data_file << endl;
+        }
 
-			 break;
+        break;
         case VK_UP: break;
         case VK_DOWN: break;
         case VK_ESCAPE: exit(1);
@@ -615,10 +592,9 @@ vector<str> data_files;
       GLint x = mouseX;
       GLint y = mouseY;
       GLint viewport[4];
-      zprPick(mouseX,HEIGHT-1-mouseY,3,3);
-      glGetIntegerv(GL_VIEWPORT,viewport);
-      pos(&_dragPosX,&_dragPosY,&_dragPosZ,x,y,viewport);
-      // glutPostRedisplay();
+      zprPick(mouseX, HEIGHT - 1 - mouseY, 3, 3);
+      glGetIntegerv(GL_VIEWPORT, viewport);
+      pos(&_dragPosX, &_dragPosY, &_dragPosZ, x, y, viewport);
       _mouseX = mouseX;
       _mouseY = mouseY;
     }
@@ -631,7 +607,7 @@ vector<str> data_files;
       mouseY = HIWORD(lParam);
       GLint x = mouseX;
       GLint y = mouseY;
-      GLint viewport[4]; //zprPick(mouseX,HEIGHT-1-mouseY,3,3);
+      GLint viewport[4];
       glGetIntegerv(GL_VIEWPORT,viewport);
       pos(&_dragPosX,&_dragPosY,&_dragPosZ,x,y,viewport);
     }
@@ -651,7 +627,6 @@ vector<str> data_files;
       _mouseRight = false;
       mouseX = LOWORD(lParam);
       mouseY = HIWORD(lParam);
-
     }
     break;
 
@@ -684,25 +659,27 @@ void reset_view(){
 }
 
 void processHits(GLint hits, GLuint buffer[]){
-  
   unsigned int i, j;
   myPickNames.clear();
-  GLuint names, *ptr, minZ,*ptrNames, numberOfNames;
-  if(hits <=0 ) return;
+  GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
+  if(hits <= 0) return;
   //printf ("hits = %d names:{", hits);
   ptr = (GLuint *) buffer;
   minZ = 0xffffffff;
-  for (i = 0; i < hits; i++) {
+  for0(i, hits){
     //printf("(i%d)",i);
     names = *ptr;
     ptr++;
     GLint mindepth = *ptr; ptr++;
     GLint maxdepth = *ptr; ptr++;
-    for(j = 0; j < names; j++){
-      GLint name = *ptr; // printf(",%d",name);
+    for0(j, names){
+      GLint name = *ptr;
+      // printf(",%d",name);
       if(name >= 0){
         myPickNames.insert(name);
-        if(SHIFT_KEY) rX = sphere_pos[name];
+        if(SHIFT_KEY){
+          rX = sphere_pos[name];
+        }
       }
       ptr++;
     }
@@ -736,7 +713,6 @@ void zprPick(GLdouble x, GLdouble y,GLdouble delX, GLdouble delY){
   glMultMatrixd(projection); /* Apply projection matrix */
 
   glMatrixMode(GL_MODELVIEW);
-
   draw(true);
 
   // Draw the scene in selection mode
@@ -748,8 +724,14 @@ void zprPick(GLdouble x, GLdouble y,GLdouble delX, GLdouble delY){
   return;
 }
 
+void convert_3d_to_2d(float x, float y, float z, float & u, float & v){
+  GLdouble proj[16]; GLdouble model[16]; GLint view[4];
+  glGetDoublev(GL_PROJECTION_MATRIX, proj);
+  glGetDoublev(GL_MODELVIEW_MATRIX, model);
+  glGetIntegerv(GL_VIEWPORT, view);
 
-
-class glPlottable{
-
-};
+  double vx, vy, vz;
+  gluProject(x, y, z, model, proj, view, &vx, &vy, &vz);
+  u = (float)vx;
+  v = (float)(vy - WIDTH);
+}
