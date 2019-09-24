@@ -1,4 +1,4 @@
-''' 2019/01/20 arichardson
+''' 2019/01/20
 this file was for a counting analysis of education data'''
 import os
 import sys
