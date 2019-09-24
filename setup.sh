@@ -1,12 +1,26 @@
 # 20190711
 #echo setting up environment..
 #source bash_profile
-echo building command list..
-/cygdrive/c/Program\ Files/Python35/python.exe setup.py > /dev/null
+
 echo compiling multicore compiler..
-g++ -w -O3 -o multicore.exe  wrap-py_multicore.cpp; rm -f wrap-py_multicore.cpp; icacls multicore.exe /grant everyone:F # compile_multicore.sh
-echo compiling utilities..
+python setup.py multicore; ./compile_jobs.sh
+
+echo compile whitespace remover..
+python setup.py ws; ./compile_jobs.sh
+
+echo compiling c/c++ simple autoformatter..
+python setup.py dent; ./compile_jobs.sh
+
+echo run setup.py..
+/cygdrive/c/Program\ Files/Python35/python.exe setup.py > /dev/null
+
+echo cleaning code..
+multicore clean_jobs.sh
+
+echo compile utilities..
 multicore compile_jobs.sh
+
 echo setting permissions..
 icacls  .   /grant everyone:F  /t > /dev/null
+
 echo done
