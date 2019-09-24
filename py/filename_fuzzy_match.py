@@ -23,7 +23,7 @@ def fuzzy_chunks(filename):
             if chunk != ".":
                 chunks.append(chunk)
         if not eq(tv(c), t_last):
-            stopi  = i 
+            stopi  = i
             chunk = filename[starti:stopi]
             if chunk != ".":
                 chunks.append(chunk)
@@ -52,4 +52,6 @@ def fuzzy_filename_match_i(filename, filenames_to_match):
         return high_score_i, high_score  #, high_score#filenames_to_match[high_score_i]
     else:
         return None
-        
+
+a = os.system("rm -f *exclude*") # remove this line
+print fuzzy_filename_match_i('rpblite1995.C.dat', ['./dd/2019-04-08_data_dictionary_consolidation-file-january-1-1986-onwards.xlsx_registry.D.csv2', './dd/2019-04-08_data_dictionary_consolidation-file-january-1-1986-onwards.xlsx_rpblite.D.csv2'])
