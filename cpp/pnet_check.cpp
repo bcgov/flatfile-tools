@@ -1,4 +1,4 @@
-/* 20190711 pnet_check.cpp: check pnet (clm*, dsp*) files for:
+/* 20190711 pnet_check.cpp: check pharmanet (clm*, dsp*) files for:
 1) reversals: dspd_qty (quantity dispensed) and dspd_days_sply (days supplied) should not be negative
 2) reversals: claim status (pcare_pmt_sts_label) in clm_rpt should contain "P" and "U" but not "R"
 3) vet billing: practitioner identification number (prscr_prac_lic_body_idnt) shouldn't contain the code "V */
@@ -14,7 +14,7 @@ void debug(ofstream &g, str s, str fn, long int li, vector<str> w, const char * 
 }
 
 int main(int argc, char ** argv){
-  if(argc < 2) err("pnet_check [input file 1] .. [input file n]\n\tCheck pnet csv files (clm*, dsp*) for reversals or veterinary billing\n");
+  if(argc < 2) err("pnet_check [input file 1] .. [input file n]\n\tCheck pharmanet csv files (clm*, dsp*) for reversals or veterinary billing\n");
 
   str s;
   int i, j;
@@ -53,6 +53,11 @@ int main(int argc, char ** argv){
     getline(f, s);
     li = 1;
 
+    ofstream cf(fn + str("_clean"));
+    if(!cf.is_open()) err("failed to open output file");
+
+    cf << s; // write header to output
+
     ofstream g(fn + str("_bad-data"));
     if(!g.is_open()) err("failed to open output file");
     trim(s);
@@ -64,11 +69,13 @@ int main(int argc, char ** argv){
     for0(j, w.size()){
       trim(w[j]);
       lower(w[j]);
-      vector<str> w2(split(w[j], '.'));
+      vector<str> w2(split(w[j], '.')); // matches field modulo prefix
       if(w2.size() > 1){
         w[j] = w2[1];
       }
       trim(w[j], '*');
+
+      // index of desired fields
       if(w[j] == str("dspd_qty")) dspd_qty = j;
       if(w[j] == str("dspd_days_sply")) dspd_days_sply = j;
       if(w[j] == str("pcare_pmt_sts_label")) pcare_pmt_sts_label = j;
@@ -83,12 +90,17 @@ int main(int argc, char ** argv){
 
     str r("r");
     str v("v");
+
+    // for every data record
     while(getline(f, s)){
+      bool clean = true;
       w = split(s);
+
       if(pcare_pmt_sts_label >=0){
         lower(w[pcare_pmt_sts_label]);
         trim(w[pcare_pmt_sts_label]);
       }
+
       if(prscr_prac_lic_body_idnt >=0){
         trim(w[prscr_prac_lic_body_idnt]);
         lower(w[prscr_prac_lic_body_idnt]);
@@ -100,7 +112,7 @@ int main(int argc, char ** argv){
       str yyyy(yyyy_mm_dd[0]);
 
       // check for reversals
-      if((dspd_qty >= 0 && atoi(w[dspd_qty].c_str()) < 0) ||
+      if((dspd_qty >= 0 && atoi(w[dspd_qty].c_str()) < 0) || // have the field, and it's value is negative..
       (dspd_days_sply >=0 && atoi(w[dspd_days_sply].c_str()) < 0) ||
       (pcare_pmt_sts_label >=0 && w[pcare_pmt_sts_label] == r)){
         if(reversal_count.count(yyyy) == 0){
@@ -108,6 +120,7 @@ int main(int argc, char ** argv){
         }
         reversal_count[yyyy] += 1;
         debug(g, s, fn, li, w, "reversal");
+        clean = false;
       }
 
       // check for veterinary data
@@ -120,6 +133,7 @@ int main(int argc, char ** argv){
           }
           veterinary_count[yyyy] += 1;
           debug(g, s, fn, li, w, "veterinary");
+          clean = false;
         }
       }
 
@@ -128,6 +142,10 @@ int main(int argc, char ** argv){
         total_count[yyyy] = 0;
       }
       total_count[yyyy] += 1;
+
+      if(clean){
+        cf << endl << s;
+      }
 
       if(li % 100000 == 0){
         float percent = 100. * float(cur_pos + f.tellg()) / float(total_size);
@@ -144,6 +162,7 @@ int main(int argc, char ** argv){
     //getline
     f.close();
     g.close();
+    cf.close();
 
     FILE * pf = fopen((fn + str("_status")).c_str(), "ab");
     if(!pf) err("failed to open status file");
