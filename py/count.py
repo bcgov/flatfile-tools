@@ -4,12 +4,13 @@ import sys
 import operator
 from misc import *
 
+# note: need to finish documenting this
 if len(sys.argv) < 2:
     err("usage: count.py [csv input file]")
 
 f = open(sys.argv[1])
-f_count = open(sys.argv[1] + "_count", "wb")
-f_freq = open(sys.argv[1] + "_frequ", "wb")
+f_count = open(sys.argv[1] + "_count.csv", "wb")
+f_freq = open(sys.argv[1] + "_frequ.csv", "wb")
 
 IGNORE_STUDYID = len(sys.argv) > 2
 
@@ -50,27 +51,28 @@ for i in range(0, len(fields)):
     print("sorting field ", fields[i], "..")
     if True: #len(occ[i]) < 100:
         n = 0  # number of observations
-        s = str(fields[i])
+        #s = str(fields[i])
         occ_i = sorted(occ[i].items(), key=operator.itemgetter(0))
         for j in occ_i:
-            s += "\n  " + str(j)
+        #    s += "\n  " + str(j)
             n += j[1]
-        counts.append(s)
-
-        s = str(fields[i])
+            #counts.append(s)
+            counts.append(str(fields[i]) + "," + str(j[0]) + "," + str(j[1]))
+        #s = str(fields[i])
         occ_i = sorted(occ[i].items(), key=operator.itemgetter(1), reverse=True)
         for k in range(0, len(occ_i)):
             j = occ_i[k]
             j = list(j)
-            j[1] = j[1] * (100. / float(n))
+            j[1] = j[1] * (1. / float(n))  # was 100. / float(n)
             j = tuple(j)
-            s += "\n  " + str(j)
-        frequs.append(s)
+            frequs.append(str(fields[i]) + "," + str(j[0]) + "," + str(j[1]))
+            #s += "\n  " + str(j)
+        #frequs.append(s)
 
-f_count.write("COUNTS\n".encode())
+f_count.write("variable,value,count") #COUNTS\n".encode())
 for c in counts:
-    f_count.write((str(c) + "\n").encode())
+    f_count.write(('\n' + str(c)).encode())
 
-f_freq.write("FREQUENCIES\n".encode())
+f_freq.write("variable,value,frequency") #FREQUENCIES\n".encode())
 for f in frequs:
-    f_freq.write((str(f) + "\n").encode())
+    f_freq.write(('\n' + str(f)).encode())
