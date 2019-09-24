@@ -47,7 +47,7 @@ inline void incr(std::string label){
 int main(int argc, char ** argv){
 
   if(argc < 2){
-	  cout << "co_occur.cpp: default field selection: all" << endl;
+    cout << "co_occur.cpp: default field selection: all" << endl;
     err("co_occur [input file.csv] [optional selected field 1] .. [optional selected field n]");
   }
   int i;
@@ -76,28 +76,27 @@ int main(int argc, char ** argv){
     cout << *it << endl;
   }
 
-
   getline(infile, line);
   std::vector<std::string> w(split(line, ','));
   fields = w;
-      n_f = w.size();
-      if(select.size() > 0){
-        for0(i, n_f){
-          if(select.count(fields[i]) > 0){
-            select_i.push_back(i);
-          }
-        }
-        combs = n_choose_up_to_m(select_i.size(), s_s);
+  n_f = w.size();
+  if(select.size() > 0){
+    for0(i, n_f){
+      if(select.count(fields[i]) > 0){
+        select_i.push_back(i);
       }
-      else combs = n_choose_up_to_m(n_f, s_s); 
-  
+    }
+    combs = n_choose_up_to_m(select_i.size(), s_s);
+  }
+  else combs = n_choose_up_to_m(n_f, s_s);
+
   while(std::getline(infile, line)){
     w = split(line, ',');
 
-      if(w.size() != n_f){
-        cout << "Error: unexpected # of fields " << std::endl; return -1;
-      }
-    
+    if(w.size() != n_f){
+      cout << "Error: unexpected # of fields " << std::endl; return -1;
+    }
+
     vector<string> w_f;
     if(select.size() > 0){
       for0(i, select_i.size()){
@@ -124,18 +123,17 @@ int main(int argc, char ** argv){
   /* output string counts */
   for(std::map<std::string, unsigned long int>::iterator ti=counts.begin(); ti!=counts.end(); ti++){
     pq.push(count_idx(ti->first, ti->second));
-   }
+  }
 
   cout << "code_length,count,count" << endl;
   while(!pq.empty()){
-     count_idx x(pq.top());
-     pq.pop();
-     str item(x.item);
-	
-     cout <<  split(item).size()  << "," << x.count << ",\""  << item << "\"" << std::endl;
+    count_idx x(pq.top());
+    pq.pop();
+    str item(x.item);
+
+    cout << split(item).size() << "," << x.count << ",\"" << item << "\"" << std::endl;
 
   }
-
 
   return 0;
 }
