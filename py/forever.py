@@ -5,7 +5,7 @@ import sys
 import time
 from misc import *
 
-default = 10
+default = 10 # default interval (s) to repeat command
 args = sys.argv
 delay, arg = default, " ".join(args[1:])
 if len(args) > 1:
