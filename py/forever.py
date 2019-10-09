@@ -1,3 +1,5 @@
+# to run a terminal command repeatedly, e.g. for monitoring processes, prefix it with "forever"
+# e.g.: forever 1 ls -latrh to monitor files produced by a process
 import os
 import sys
 import time
@@ -25,3 +27,6 @@ if len(args) > 1:
             if a != 0:
                 pass # could have a warning in here
         time.sleep(delay)
+else:
+    err("usage:\n\tforever [optional delay parameter in seconds] [your command(s) go here] [your command(s) go here]" +
+        "\n\te.g. forever 1 ls -latrh to monitor files produced by a process")
