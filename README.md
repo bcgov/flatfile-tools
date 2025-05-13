@@ -1,3 +1,7 @@
+[![Lifecycle:Retired](https://img.shields.io/badge/Lifecycle-Retired-d45500)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+
+
+
 # flatfile_tools
 Scripts for wrangling arbitrarily large tables AKA "flat files"; python 2 and 3, C/C++ and R syntax are leveraged. Python3 now supported for building
 * conversion from fixed-width format to csv
